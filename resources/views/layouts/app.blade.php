@@ -26,39 +26,80 @@
 
                 <div class="collapse navbar-collapse" id="mainNavigation">
                     <ul class="navbar-nav w-100">
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('barang.*') ? 'active' : '' }}" href="{{ route('barang.index') }}">Barang</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('satuan.*') ? 'active' : '' }}" href="{{ route('satuan.index') }}">Satuan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('vendor.*') ? 'active' : '' }}" href="{{ route('vendor.index') }}">Vendor</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('role.*') ? 'active' : '' }}" href="{{ route('role.index') }}">Role</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}" href="{{ route('user.index') }}">User</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('margin-penjualan.*') ? 'active' : '' }}" href="{{ route('margin-penjualan.index') }}">Margin Penjualan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('pengadaan.*') ? 'active' : '' }}" href="{{ route('pengadaan.index') }}">Pengadaan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('penerimaan.*') ? 'active' : '' }}" href="{{ route('penerimaan.index') }}">Penerimaan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('penjualan.*') ? 'active' : '' }}" href="{{ route('penjualan.index') }}">Penjualan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('retur.*') ? 'active' : '' }}" href="{{ route('retur.index') }}">Retur</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('kartu-stok.*') ? 'active' : '' }}" href="{{ route('kartu-stok.index') }}">Kartu Stok</a>
-                        </li>
+                        @can('administrasi')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('barang.*') ? 'active' : '' }}" href="{{ route('barang.index') }}">Barang</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('satuan.*') ? 'active' : '' }}" href="{{ route('satuan.index') }}">Satuan</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('vendor.*') ? 'active' : '' }}" href="{{ route('vendor.index') }}">Vendor</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('role.*') ? 'active' : '' }}" href="{{ route('role.index') }}">Role</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}" href="{{ route('user.index') }}">User</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('margin-penjualan.*') ? 'active' : '' }}" href="{{ route('margin-penjualan.index') }}">Margin Penjualan</a>
+                            </li>
+                        @endcan
+                        <li class="sidebar-divider" aria-hidden="true"></li>
+                        @can('pengadaan.baca')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('pengadaan.*') ? 'active' : '' }}" href="{{ route('pengadaan.index') }}">Pengadaan</a>
+                            </li>
+                        @endcan
+                        @can('penerimaan.baca')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('penerimaan.*') ? 'active' : '' }}" href="{{ route('penerimaan.index') }}">Penerimaan</a>
+                            </li>
+                        @endcan
+                        @can('administrasi')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('penjualan.*') ? 'active' : '' }}" href="{{ route('penjualan.index') }}">Penjualan</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('retur.*') ? 'active' : '' }}" href="{{ route('retur.index') }}">Retur</a>
+                            </li>
+                        @endcan
+                        @can('kartu-stok.baca')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('kartu-stok.*') ? 'active' : '' }}" href="{{ route('kartu-stok.index') }}">Kartu Stok</a>
+                            </li>
+                        @endcan
+                        @can('stok-barang.baca')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('stok-barang.*') ? 'active' : '' }}" href="{{ route('stok-barang.index') }}">Stok Barang</a>
+                            </li>
+                        @endcan
+                        @auth
+                            <li class="nav-item">
+                                <span class="nav-link d-flex align-items-center gap-2">
+                                    <svg class="flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <circle cx="12" cy="9" r="3"></circle>
+                                        <path d="M5.5 19a7 7 0 0 1 13 0"></path>
+                                    </svg>
+                                    <span class="text-break">
+                                        {{ auth()->user()->username }}
+                                        <small class="d-block">{{ auth()->user()->nama_role }}</small>
+                                    </span>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="nav-link">Keluar</button>
+                                </form>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">Masuk</a>
+                            </li>
+                        @endauth
                     </ul>
                 </div>
             </div>

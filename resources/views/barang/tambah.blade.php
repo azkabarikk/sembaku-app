@@ -52,7 +52,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="harga">Harga</label>
+            <label class="form-label" for="harga">Harga beli awal</label>
             <input
                 class="form-control @error('harga') is-invalid @enderror"
                 id="harga"

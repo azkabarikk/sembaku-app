@@ -51,7 +51,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="harga">Harga</label>
+            <label class="form-label" for="harga">{{ $hargaTerkunci ? 'Harga beli terakhir' : 'Harga beli awal' }}</label>
             <input
                 class="form-control @error('harga') is-invalid @enderror"
                 id="harga"
@@ -59,8 +59,9 @@
                 type="number"
                 min="0"
                 step="1"
-                value="{{ old('harga', $barang->harga) }}"
-                required
+                value="{{ $hargaTerkunci ? $barang->harga : old('harga', $barang->harga) }}"
+                @readonly($hargaTerkunci)
+                @required(! $hargaTerkunci)
             >
             @error('harga')
                 <div class="invalid-feedback">{{ $message }}</div>

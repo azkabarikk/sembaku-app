@@ -11,14 +11,22 @@ class BarangController extends Controller
 {
     public function index(): View
     {
+        $marginAktif = DB::select(
+            'SELECT persen FROM margin_penjualan WHERE status = ? ORDER BY idmargin_penjualan LIMIT 2',
+            [1]
+        );
+        $persenMargin = count($marginAktif) === 1 ? $marginAktif[0]->persen : null;
+
         $daftarBarang = DB::select(
-            'SELECT idbarang, nama, jenis, nama_satuan, harga, status
+            'SELECT idbarang, nama, jenis, nama_satuan, harga, status, fn_harga_jual(harga, ?) AS harga_jual
              FROM v_master_barang
-             ORDER BY idbarang'
+             ORDER BY idbarang',
+            [$persenMargin]
         );
 
         return view('barang.index', [
             'daftarBarang' => $daftarBarang,
+            'jumlahMarginAktif' => count($marginAktif),
         ]);
     }
 
@@ -43,7 +51,7 @@ class BarangController extends Controller
             'nama' => 'required|string|max:45',
             'jenis' => 'required|in:R,S',
             'idsatuan' => 'required|integer',
-            'harga' => 'required|integer|min:0',
+            'harga' => 'required|integer|min:0|max:2147483647',
             'status' => 'required|in:0,1',
         ]);
 
@@ -101,6 +109,7 @@ class BarangController extends Controller
 
         return view('barang.edit', [
             'barang' => $barang,
+            'hargaTerkunci' => $this->memilikiPenerimaan($id),
             'daftarSatuan' => $daftarSatuan,
         ]);
     }
@@ -111,54 +120,40 @@ class BarangController extends Controller
             'nama' => 'required|string|max:45',
             'jenis' => 'required|in:R,S',
             'idsatuan' => 'required|integer',
-            'harga' => 'required|integer|min:0',
             'status' => 'required|in:0,1',
         ]);
 
-        $barang = DB::selectOne(
-            'SELECT idbarang, idsatuan
-             FROM v_master_barang
-             WHERE idbarang = ?',
-            [$id]
-        );
+        return DB::transaction(function () use ($request, $validated, $id): RedirectResponse {
+            $barang = DB::selectOne(
+                'SELECT idsatuan, harga FROM barang WHERE idbarang = ? FOR UPDATE',
+                [$id]
+            );
+            abort_if(! $barang, 404);
 
-        if (! $barang) {
-            abort(404);
-        }
+            $harga = $this->memilikiPenerimaan($id)
+                ? $barang->harga
+                : $request->validate(['harga' => 'required|integer|min:0|max:2147483647'])['harga'];
 
-        $satuanAktif = DB::selectOne(
-            'SELECT idsatuan
-             FROM v_master_satuan
-             WHERE idsatuan = ?
-             AND (status = ? OR idsatuan = ?)',
-            [$validated['idsatuan'], 1, $barang->idsatuan]
-        );
+            $satuanAktif = DB::selectOne(
+                'SELECT idsatuan FROM v_master_satuan
+                 WHERE idsatuan = ? AND (status = ? OR idsatuan = ?)',
+                [$validated['idsatuan'], 1, $barang->idsatuan]
+            );
 
-        if (! $satuanAktif) {
-            return back()
-                ->withErrors([
-                    'idsatuan' => 'Satuan tidak ditemukan atau tidak aktif.',
-                ])
-                ->withInput();
-        }
+            if (! $satuanAktif) {
+                return back()
+                    ->withErrors(['idsatuan' => 'Satuan tidak ditemukan atau tidak aktif.'])
+                    ->withInput();
+            }
 
-        DB::update(
-            'UPDATE barang
-             SET nama = ?, jenis = ?, idsatuan = ?, harga = ?, status = ?
-             WHERE idbarang = ?',
-            [
-                $validated['nama'],
-                $validated['jenis'],
-                $validated['idsatuan'],
-                $validated['harga'],
-                $validated['status'],
-                $id,
-            ]
-        );
+            DB::update(
+                'UPDATE barang SET nama = ?, jenis = ?, idsatuan = ?, harga = ?, status = ?
+                 WHERE idbarang = ?',
+                [$validated['nama'], $validated['jenis'], $validated['idsatuan'], $harga, $validated['status'], $id]
+            );
 
-        return redirect()
-            ->route('barang.index')
-            ->with('success', 'Barang berhasil diperbarui.');
+            return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui.');
+        }, 3);
     }
 
     public function destroy(int $id): RedirectResponse
@@ -184,5 +179,15 @@ class BarangController extends Controller
         return redirect()
             ->route('barang.index')
             ->with('success', 'Barang berhasil dinonaktifkan.');
+    }
+
+    private function memilikiPenerimaan(int $id): bool
+    {
+        return DB::selectOne(
+            'SELECT d.iddetail_penerimaan
+             FROM detail_penerimaan d JOIN penerimaan p ON p.idpenerimaan = d.idpenerimaan
+             WHERE d.barang_idbarang = ? AND p.status IN (?, ?) LIMIT 1',
+            [$id, 'K', 'A']
+        ) !== null;
     }
 }

@@ -25,15 +25,7 @@ class MarginPenjualanController extends Controller
 
     public function create(): View
     {
-        $daftarUser = DB::select(
-            'SELECT iduser, username
-             FROM v_master_user
-             ORDER BY username'
-        );
-
-        return view('margin_penjualan.create', [
-            'daftarUser' => $daftarUser,
-        ]);
+        return view('margin_penjualan.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -41,40 +33,28 @@ class MarginPenjualanController extends Controller
         $validated = $request->validate([
             'persen' => 'required|numeric|min:0|max:100',
             'status' => 'required|in:0,1',
-            'iduser' => 'required|integer',
         ]);
 
-        $user = DB::selectOne(
-            'SELECT iduser
-             FROM v_master_user
-             WHERE iduser = ?',
-            [$validated['iduser']]
-        );
+        $idUser = (int) $request->user()->getAuthIdentifier();
 
-        if (! $user) {
-            return back()
-                ->withErrors([
-                    'iduser' => 'User tidak ditemukan.',
-                ])
-                ->withInput();
-        }
+        DB::transaction(function () use ($validated, $idUser): void {
+            $this->kunciDaftarMargin();
 
-        DB::transaction(function () use ($validated): void {
             DB::insert(
                 'INSERT INTO margin_penjualan (persen, status, iduser)
                  VALUES (?, 0, ?)',
                 [
                     $validated['persen'],
-                    $validated['iduser'],
+                    $idUser,
                 ]
             );
 
             if ((int) $validated['status'] === 1) {
                 $idMargin = (int) DB::getPdo()->lastInsertId();
 
-                DB::statement('CALL sp_set_margin_aktif(?)', [$idMargin]);
+                $this->aktifkanMargin($idMargin);
             }
-        });
+        }, 3);
 
         return redirect()
             ->route('margin-penjualan.index')
@@ -84,7 +64,7 @@ class MarginPenjualanController extends Controller
     public function edit(int $id): View
     {
         $margin = DB::selectOne(
-            'SELECT idmargin_penjualan, persen, status, iduser
+            'SELECT idmargin_penjualan, persen, status
              FROM v_master_margin_penjualan
              WHERE idmargin_penjualan = ?',
             [$id]
@@ -94,15 +74,8 @@ class MarginPenjualanController extends Controller
             abort(404);
         }
 
-        $daftarUser = DB::select(
-            'SELECT iduser, username
-             FROM v_master_user
-             ORDER BY username'
-        );
-
         return view('margin_penjualan.edit', [
             'margin' => $margin,
-            'daftarUser' => $daftarUser,
         ]);
     }
 
@@ -111,51 +84,26 @@ class MarginPenjualanController extends Controller
         $validated = $request->validate([
             'persen' => 'required|numeric|min:0|max:100',
             'status' => 'required|in:0,1',
-            'iduser' => 'required|integer',
         ]);
 
-        $margin = DB::selectOne(
-            'SELECT idmargin_penjualan
-             FROM v_master_margin_penjualan
-             WHERE idmargin_penjualan = ?',
-            [$id]
-        );
-
-        if (! $margin) {
-            abort(404);
-        }
-
-        $user = DB::selectOne(
-            'SELECT iduser
-             FROM v_master_user
-             WHERE iduser = ?',
-            [$validated['iduser']]
-        );
-
-        if (! $user) {
-            return back()
-                ->withErrors([
-                    'iduser' => 'User tidak ditemukan.',
-                ])
-                ->withInput();
-        }
-
         DB::transaction(function () use ($validated, $id): void {
+            $this->kunciDaftarMargin();
+            $this->pastikanMarginAda($id);
+
             DB::update(
                 'UPDATE margin_penjualan
-                 SET persen = ?, status = 0, iduser = ?
+                 SET persen = ?, status = 0
                  WHERE idmargin_penjualan = ?',
                 [
                     $validated['persen'],
-                    $validated['iduser'],
                     $id,
                 ]
             );
 
             if ((int) $validated['status'] === 1) {
-                DB::statement('CALL sp_set_margin_aktif(?)', [$id]);
+                $this->aktifkanMargin($id);
             }
-        });
+        }, 3);
 
         return redirect()
             ->route('margin-penjualan.index')
@@ -164,26 +112,31 @@ class MarginPenjualanController extends Controller
 
     public function destroy(int $id): RedirectResponse
     {
-        $margin = DB::selectOne(
-            'SELECT idmargin_penjualan
-             FROM v_master_margin_penjualan
-             WHERE idmargin_penjualan = ?',
-            [$id]
-        );
-
-        if (! $margin) {
-            abort(404);
-        }
-
-        DB::update(
-            'UPDATE margin_penjualan
-             SET status = ?
-             WHERE idmargin_penjualan = ?',
-            [0, $id]
-        );
+        DB::transaction(function () use ($id): void {
+            $this->kunciDaftarMargin();
+            $this->pastikanMarginAda($id);
+            DB::update('UPDATE margin_penjualan SET status = ? WHERE idmargin_penjualan = ?', [0, $id]);
+        }, 3);
 
         return redirect()
             ->route('margin-penjualan.index')
             ->with('success', 'Margin penjualan berhasil dinonaktifkan.');
+    }
+
+    private function aktifkanMargin(int $id): void
+    {
+        $this->pastikanMarginAda($id);
+        DB::statement('CALL sp_set_margin_aktif(?)', [$id]);
+    }
+
+    private function pastikanMarginAda(int $id): void
+    {
+        $margin = DB::selectOne('SELECT idmargin_penjualan FROM margin_penjualan WHERE idmargin_penjualan = ?', [$id]);
+        abort_if(! $margin, 404);
+    }
+
+    private function kunciDaftarMargin(): void
+    {
+        DB::select('SELECT idmargin_penjualan FROM margin_penjualan ORDER BY idmargin_penjualan FOR UPDATE');
     }
 }

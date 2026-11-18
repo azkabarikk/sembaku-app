@@ -17,6 +17,10 @@
         <a class="btn btn-primary" href="{{ route('barang.create') }}">Tambah Barang</a>
     </div>
 
+    @if ($jumlahMarginAktif !== 1)
+        <p class="text-muted">{{ $jumlahMarginAktif === 0 ? 'Belum ada margin aktif.' : 'Ada lebih dari satu margin aktif.' }} Harga jual belum ditampilkan.</p>
+    @endif
+
     <div class="table-responsive">
         <table class="table table-striped table-bordered align-middle bg-white">
             <thead class="table-light">
@@ -25,7 +29,8 @@
                     <th scope="col">Nama Barang</th>
                     <th scope="col">Jenis</th>
                     <th scope="col">Satuan</th>
-                    <th scope="col">Harga</th>
+                    <th scope="col">Harga Beli Terakhir</th>
+                    <th scope="col">Harga Jual</th>
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
                 </tr>
@@ -38,6 +43,7 @@
                         <td>{{ $barang->jenis === 'S' ? 'Sembako' : 'Rumah Tangga' }}</td>
                         <td>{{ $barang->nama_satuan }}</td>
                         <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                        <td>{{ $barang->harga_jual === null ? '—' : 'Rp '.number_format($barang->harga_jual, 0, ',', '.') }}</td>
                         <td>
                             @if ($barang->status == 1)
                                 <span class="badge text-bg-success">Aktif</span>
@@ -64,7 +70,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center">Belum ada data barang.</td>
+                        <td colspan="8" class="text-center">Belum ada data barang.</td>
                     </tr>
                 @endforelse
             </tbody>

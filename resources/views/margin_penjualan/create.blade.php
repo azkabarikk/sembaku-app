@@ -2,7 +2,7 @@
 
 @section('title', 'Tambah Margin Penjualan')
 @section('heading', 'Tambah Margin Penjualan')
-@section('description', 'Isi persentase margin dan user yang mencatatnya.')
+@section('description', 'Isi persentase margin dan pilih statusnya.')
 
 @section('content')
     <form method="POST" action="{{ route('margin-penjualan.store') }}">
@@ -36,21 +36,6 @@
                 <option value="0" @selected(old('status') === '0')>Tidak Aktif</option>
             </select>
             @error('status')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="iduser">User</label>
-            <select class="form-select @error('iduser') is-invalid @enderror" id="iduser" name="iduser" required>
-                <option value="">Pilih user</option>
-                @foreach ($daftarUser as $user)
-                    <option value="{{ $user->iduser }}" @selected(old('iduser') == $user->iduser)>
-                        {{ $user->username }}
-                    </option>
-                @endforeach
-            </select>
-            @error('iduser')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
