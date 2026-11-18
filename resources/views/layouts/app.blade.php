@@ -43,6 +43,21 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('margin-penjualan.*') ? 'active' : '' }}" href="{{ route('margin-penjualan.index') }}">Margin Penjualan</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('pengadaan.*') ? 'active' : '' }}" href="{{ route('pengadaan.index') }}">Pengadaan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('penerimaan.*') ? 'active' : '' }}" href="{{ route('penerimaan.index') }}">Penerimaan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('penjualan.*') ? 'active' : '' }}" href="{{ route('penjualan.index') }}">Penjualan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('retur.*') ? 'active' : '' }}" href="{{ route('retur.index') }}">Retur</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('kartu-stok.*') ? 'active' : '' }}" href="{{ route('kartu-stok.index') }}">Kartu Stok</a>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -1,8 +1,13 @@
 <?php
 
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\KartuStokController;
 use App\Http\Controllers\MarginPenjualanController;
+use App\Http\Controllers\PenerimaanController;
+use App\Http\Controllers\PengadaanController;
+use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ReturController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
@@ -11,6 +16,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/pengadaan', [PengadaanController::class, 'index'])
+    ->name('pengadaan.index');
+
+Route::get('/penerimaan', [PenerimaanController::class, 'index'])
+    ->name('penerimaan.index');
+
+Route::get('/penjualan', [PenjualanController::class, 'index'])
+    ->name('penjualan.index');
+
+Route::get('/retur', [ReturController::class, 'index'])
+    ->name('retur.index');
+
+Route::get('/kartu-stok', [KartuStokController::class, 'index'])
+    ->name('kartu-stok.index');
 
 Route::get('/barang', [BarangController::class, 'index'])
     ->name('barang.index');
