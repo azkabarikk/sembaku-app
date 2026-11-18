@@ -1,2 +1,44 @@
 @import 'variables';
 @import 'bootstrap/scss/bootstrap';
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.app-sidebar {
+    align-items: flex-start;
+    flex: 0 0 250px;
+    min-height: 100vh;
+    width: 250px;
+}
+
+.app-sidebar .navbar-collapse {
+    width: 100%;
+}
+
+.app-sidebar .navbar-nav {
+    flex-direction: column;
+}
+
+.app-sidebar .nav-link {
+    border-radius: 0.25rem;
+    padding: 0.55rem 0.75rem;
+}
+
+.app-sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+@media (max-width: 991.98px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .app-sidebar {
+        flex-basis: auto;
+        min-height: auto;
+        width: 100%;
+    }
+}
