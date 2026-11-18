@@ -90,6 +90,21 @@ Route::delete('/user/{id}', [UserController::class, 'destroy'])
 Route::get('/margin-penjualan', [MarginPenjualanController::class, 'index'])
     ->name('margin-penjualan.index');
 
+Route::get('/margin-penjualan/create', [MarginPenjualanController::class, 'create'])
+    ->name('margin-penjualan.create');
+
+Route::post('/margin-penjualan', [MarginPenjualanController::class, 'store'])
+    ->name('margin-penjualan.store');
+
+Route::get('/margin-penjualan/{id}/edit', [MarginPenjualanController::class, 'edit'])
+    ->name('margin-penjualan.edit');
+
+Route::put('/margin-penjualan/{id}', [MarginPenjualanController::class, 'update'])
+    ->name('margin-penjualan.update');
+
+Route::delete('/margin-penjualan/{id}', [MarginPenjualanController::class, 'destroy'])
+    ->name('margin-penjualan.destroy');
+
 Route::get('/barang/create', [BarangController::class, 'create'])
     ->name('barang.create');
 
