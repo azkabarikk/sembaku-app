@@ -36,6 +36,21 @@ Route::delete('/satuan/{id}', [SatuanController::class, 'destroy'])
 Route::get('/vendor', [VendorController::class, 'index'])
     ->name('vendor.index');
 
+Route::get('/vendor/create', [VendorController::class, 'create'])
+    ->name('vendor.create');
+
+Route::post('/vendor', [VendorController::class, 'store'])
+    ->name('vendor.store');
+
+Route::get('/vendor/{id}/edit', [VendorController::class, 'edit'])
+    ->name('vendor.edit');
+
+Route::put('/vendor/{id}', [VendorController::class, 'update'])
+    ->name('vendor.update');
+
+Route::delete('/vendor/{id}', [VendorController::class, 'destroy'])
+    ->name('vendor.destroy');
+
 Route::get('/role', [RoleController::class, 'index'])
     ->name('role.index');
 
