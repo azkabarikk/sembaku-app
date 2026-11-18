@@ -18,6 +18,21 @@ Route::get('/barang', [BarangController::class, 'index'])
 Route::get('/satuan', [SatuanController::class, 'index'])
     ->name('satuan.index');
 
+Route::get('/satuan/create', [SatuanController::class, 'create'])
+    ->name('satuan.create');
+
+Route::post('/satuan', [SatuanController::class, 'store'])
+    ->name('satuan.store');
+
+Route::get('/satuan/{id}/edit', [SatuanController::class, 'edit'])
+    ->name('satuan.edit');
+
+Route::put('/satuan/{id}', [SatuanController::class, 'update'])
+    ->name('satuan.update');
+
+Route::delete('/satuan/{id}', [SatuanController::class, 'destroy'])
+    ->name('satuan.destroy');
+
 Route::get('/vendor', [VendorController::class, 'index'])
     ->name('vendor.index');
 
