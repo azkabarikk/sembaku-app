@@ -1,123 +1,87 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Tambah Barang</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>Tambah Barang</h1>
+@section('title', 'Tambah Barang')
+@section('heading', 'Tambah Barang')
+@section('description', 'Isi informasi barang yang akan ditambahkan.')
 
+@section('content')
     <form method="POST" action="{{ route('barang.store') }}">
         @csrf
 
-        {{-- Nama --}}
-        <div>
-            <label>Nama Barang</label><br>
+        <div class="mb-3">
+            <label class="form-label" for="nama">Nama Barang</label>
             <input
-                type="text"
+                class="form-control @error('nama') is-invalid @enderror"
+                id="nama"
                 name="nama"
+                type="text"
+                maxlength="45"
                 value="{{ old('nama') }}"
+                required
             >
-
             @error('nama')
-                <div>{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <br>
-
-        {{-- Jenis --}}
-        <div>
-            <label>Jenis</label><br>
-
-            <select name="jenis">
-            <option value="">-- Pilih Jenis --</option>
-            <option value="S" {{ old('jenis') == 'S' ? 'selected' : '' }}>
-                Sembako
-            </option>
-            <option value="R" {{ old('jenis') == 'R' ? 'selected' : '' }}>
-                Rumah Tangga
-            </option>
-</select>
-
-@error('jenis')
-    <div>{{ $message }}</div>
-@enderror
+        <div class="mb-3">
+            <label class="form-label" for="jenis">Jenis</label>
+            <select class="form-select @error('jenis') is-invalid @enderror" id="jenis" name="jenis" required>
+                <option value="">Pilih jenis</option>
+                <option value="S" @selected(old('jenis') === 'S')>Sembako</option>
+                <option value="R" @selected(old('jenis') === 'R')>Rumah Tangga</option>
+            </select>
+            @error('jenis')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <br>
-
-        {{-- Satuan --}}
-        <div>
-            <label>Satuan</label><br>
-
-            <select name="idsatuan">
-                <option value="">-- Pilih Satuan --</option>
-
+        <div class="mb-3">
+            <label class="form-label" for="idsatuan">Satuan</label>
+            <select class="form-select @error('idsatuan') is-invalid @enderror" id="idsatuan" name="idsatuan" required>
+                <option value="">Pilih satuan</option>
                 @foreach ($daftarSatuan as $satuan)
-                    <option
-                        value="{{ $satuan->idsatuan }}"
-                        {{ old('idsatuan') == $satuan->idsatuan ? 'selected' : '' }}
-                    >
+                    <option value="{{ $satuan->idsatuan }}" @selected(old('idsatuan') == $satuan->idsatuan)>
                         {{ $satuan->nama_satuan }}
                     </option>
                 @endforeach
             </select>
-
             @error('idsatuan')
-                <div>{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <br>
-
-        {{-- Harga --}}
-        <div>
-            <label>Harga</label><br>
-
+        <div class="mb-3">
+            <label class="form-label" for="harga">Harga</label>
             <input
-                type="number"
+                class="form-control @error('harga') is-invalid @enderror"
+                id="harga"
                 name="harga"
-                value="{{ old('harga') }}"
+                type="number"
                 min="0"
+                step="1"
+                value="{{ old('harga') }}"
+                required
             >
-
             @error('harga')
-                <div>{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <br>
-
-        {{-- Status --}}
-        <div>
-            <label>Status</label><br>
-
-            <select name="status">
-                <option value="">-- Pilih Status --</option>
-
-                <option value="1" {{ old('status') === '1' ? 'selected' : '' }}>
-                    Aktif
-                </option>
-
-                <option value="0" {{ old('status') === '0' ? 'selected' : '' }}>
-                    Tidak Aktif
-                </option>
+        <div class="mb-3">
+            <label class="form-label" for="status">Status</label>
+            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
+                <option value="1" @selected(old('status', '1') === '1')>Aktif</option>
+                <option value="0" @selected(old('status') === '0')>Tidak Aktif</option>
             </select>
-
             @error('status')
-                <div>{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <br>
-
-        <button type="submit">Simpan</button>
-
-        <a href="{{ route('barang.index') }}">
-            Batal
-        </a>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Simpan</button>
+            <a class="btn btn-secondary" href="{{ route('barang.index') }}">Batal</a>
+        </div>
     </form>
-
-</body>
-</html>
+@endsection

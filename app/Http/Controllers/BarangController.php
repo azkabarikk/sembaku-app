@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -21,7 +22,7 @@ class BarangController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): View
     {
         $daftarSatuan = DB::select(
             'SELECT idsatuan, nama_satuan
@@ -36,7 +37,7 @@ class BarangController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:45',
@@ -46,15 +47,15 @@ class BarangController extends Controller
             'status' => 'required|in:0,1',
         ]);
 
-        $satuan = DB::selectOne(
+        $satuanAktif = DB::selectOne(
             'SELECT idsatuan
-             FROM satuan
+             FROM v_master_satuan
              WHERE idsatuan = ?
              AND status = ?',
             [$validated['idsatuan'], 1]
         );
 
-        if (! $satuan) {
+        if (! $satuanAktif) {
             return back()
                 ->withErrors([
                     'idsatuan' => 'Satuan tidak ditemukan atau tidak aktif.',
@@ -63,8 +64,7 @@ class BarangController extends Controller
         }
 
         DB::insert(
-            'INSERT INTO barang
-                (nama, jenis, idsatuan, harga, status)
+            'INSERT INTO barang (nama, jenis, idsatuan, harga, status)
              VALUES (?, ?, ?, ?, ?)',
             [
                 $validated['nama'],
@@ -80,12 +80,12 @@ class BarangController extends Controller
             ->with('success', 'Barang berhasil ditambahkan.');
     }
 
-    public function edit($id)
+    public function edit(int $id): View
     {
         $barang = DB::selectOne(
             'SELECT idbarang, nama, jenis, idsatuan, harga, status
-         FROM v_master_barang
-         WHERE idbarang = ?',
+             FROM v_master_barang
+             WHERE idbarang = ?',
             [$id]
         );
 
@@ -94,11 +94,9 @@ class BarangController extends Controller
         }
 
         $daftarSatuan = DB::select(
-            'SELECT idsatuan, nama_satuan
+            'SELECT idsatuan, nama_satuan, status
              FROM v_master_satuan
-         WHERE status = ?
-         ORDER BY nama_satuan',
-            [1]
+             ORDER BY nama_satuan'
         );
 
         return view('barang.edit', [
@@ -107,7 +105,7 @@ class BarangController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:45',
@@ -118,9 +116,9 @@ class BarangController extends Controller
         ]);
 
         $barang = DB::selectOne(
-            'SELECT idbarang
-         FROM barang
-         WHERE idbarang = ?',
+            'SELECT idbarang, idsatuan
+             FROM v_master_barang
+             WHERE idbarang = ?',
             [$id]
         );
 
@@ -128,15 +126,15 @@ class BarangController extends Controller
             abort(404);
         }
 
-        $satuan = DB::selectOne(
+        $satuanAktif = DB::selectOne(
             'SELECT idsatuan
-         FROM satuan
-         WHERE idsatuan = ?
-         AND status = ?',
-            [$validated['idsatuan'], 1]
+             FROM v_master_satuan
+             WHERE idsatuan = ?
+             AND (status = ? OR idsatuan = ?)',
+            [$validated['idsatuan'], 1, $barang->idsatuan]
         );
 
-        if (! $satuan) {
+        if (! $satuanAktif) {
             return back()
                 ->withErrors([
                     'idsatuan' => 'Satuan tidak ditemukan atau tidak aktif.',
@@ -146,12 +144,8 @@ class BarangController extends Controller
 
         DB::update(
             'UPDATE barang
-         SET nama = ?,
-             jenis = ?,
-             idsatuan = ?,
-             harga = ?,
-             status = ?
-         WHERE idbarang = ?',
+             SET nama = ?, jenis = ?, idsatuan = ?, harga = ?, status = ?
+             WHERE idbarang = ?',
             [
                 $validated['nama'],
                 $validated['jenis'],
@@ -167,12 +161,12 @@ class BarangController extends Controller
             ->with('success', 'Barang berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $barang = DB::selectOne(
             'SELECT idbarang
-         FROM barang
-         WHERE idbarang = ?',
+             FROM v_master_barang
+             WHERE idbarang = ?',
             [$id]
         );
 
@@ -182,9 +176,9 @@ class BarangController extends Controller
 
         DB::update(
             'UPDATE barang
-         SET status = 0
-         WHERE idbarang = ?',
-            [$id]
+             SET status = ?
+             WHERE idbarang = ?',
+            [0, $id]
         );
 
         return redirect()
