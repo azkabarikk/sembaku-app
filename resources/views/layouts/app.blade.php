@@ -7,114 +7,86 @@
     <title>@yield('title') - SembaKu</title>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-<body class="bg-light">
-    <div class="app-layout">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark app-sidebar">
-            <div class="container-fluid flex-column align-items-stretch p-3">
-                <a class="navbar-brand" href="{{ url('/') }}">SembaKu</a>
-                <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#mainNavigation"
-                    aria-controls="mainNavigation"
-                    aria-expanded="false"
-                    aria-label="Buka navigasi"
-                >
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+<body class="md3">
+    <x-ui.button href="#konten-utama" class="md3-skip-link">Lewati navigasi</x-ui.button>
 
-                <div class="collapse navbar-collapse" id="mainNavigation">
-                    <ul class="navbar-nav w-100">
-                        @can('administrasi')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('barang.*') ? 'active' : '' }}" href="{{ route('barang.index') }}">Barang</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('satuan.*') ? 'active' : '' }}" href="{{ route('satuan.index') }}">Satuan</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('vendor.*') ? 'active' : '' }}" href="{{ route('vendor.index') }}">Vendor</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('role.*') ? 'active' : '' }}" href="{{ route('role.index') }}">Role</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}" href="{{ route('user.index') }}">User</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('margin-penjualan.*') ? 'active' : '' }}" href="{{ route('margin-penjualan.index') }}">Margin Penjualan</a>
-                            </li>
-                        @endcan
-                        <li class="sidebar-divider" aria-hidden="true"></li>
-                        @can('pengadaan.baca')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengadaan.*') ? 'active' : '' }}" href="{{ route('pengadaan.index') }}">Pengadaan</a>
-                            </li>
-                        @endcan
-                        @can('penerimaan.baca')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('penerimaan.*') ? 'active' : '' }}" href="{{ route('penerimaan.index') }}">Penerimaan</a>
-                            </li>
-                        @endcan
-                        @can('administrasi')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('penjualan.*') ? 'active' : '' }}" href="{{ route('penjualan.index') }}">Penjualan</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('retur.*') ? 'active' : '' }}" href="{{ route('retur.index') }}">Retur</a>
-                            </li>
-                        @endcan
-                        @can('kartu-stok.baca')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('kartu-stok.*') ? 'active' : '' }}" href="{{ route('kartu-stok.index') }}">Kartu Stok</a>
-                            </li>
-                        @endcan
-                        @can('stok-barang.baca')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('stok-barang.*') ? 'active' : '' }}" href="{{ route('stok-barang.index') }}">Stok Barang</a>
-                            </li>
-                        @endcan
-                        @auth
-                            <li class="nav-item">
-                                <span class="nav-link d-flex align-items-center gap-2">
-                                    <svg class="flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <circle cx="12" cy="9" r="3"></circle>
-                                        <path d="M5.5 19a7 7 0 0 1 13 0"></path>
-                                    </svg>
-                                    <span class="text-break">
-                                        {{ auth()->user()->username }}
-                                        <small class="d-block">{{ auth()->user()->nama_role }}</small>
-                                    </span>
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="nav-link">Keluar</button>
-                                </form>
-                            </li>
-                        @else
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">Masuk</a>
-                            </li>
-                        @endauth
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    <div @class(['md3-app-frame', 'md3-app-frame--guest' => auth()->guest()])>
+        @auth
+            <x-ui.app-sidebar id="mainNavigation">
+                <x-slot:brand>
+                    <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">SembaKu</a>
+                </x-slot:brand>
 
-        <main class="app-main flex-grow-1 px-3 px-lg-4 py-4">
-            <div class="container-fluid p-0">
-                <div class="mb-4">
-                    <h1 class="h3 mb-1">@yield('heading')</h1>
-                    <p class="text-muted mb-0">@yield('description')</p>
-                </div>
+                @can('administrasi')
+                    <div class="md3-sidebar__group-label md3-type-label-medium">Master</div>
+                    <x-ui.navigation-item :href="route('barang.index')" :active="request()->routeIs('barang.*')">Barang</x-ui.navigation-item>
+                    <x-ui.navigation-item :href="route('satuan.index')" :active="request()->routeIs('satuan.*')">Satuan</x-ui.navigation-item>
+                    <x-ui.navigation-item :href="route('vendor.index')" :active="request()->routeIs('vendor.*')">Vendor</x-ui.navigation-item>
+                    <x-ui.navigation-item :href="route('role.index')" :active="request()->routeIs('role.*')">Role</x-ui.navigation-item>
+                    <x-ui.navigation-item :href="route('user.index')" :active="request()->routeIs('user.*')">User</x-ui.navigation-item>
+                    <x-ui.navigation-item :href="route('margin-penjualan.index')" :active="request()->routeIs('margin-penjualan.*')">Margin Penjualan</x-ui.navigation-item>
+                    <x-ui.divider class="md3-sidebar__divider" />
+                @endcan
+
+                @canany(['pengadaan.baca', 'penerimaan.baca', 'administrasi', 'kartu-stok.baca', 'stok-barang.baca'])
+                    <div class="md3-sidebar__group-label md3-type-label-medium">Transaksi dan stok</div>
+                @endcanany
+                @can('pengadaan.baca')
+                    <x-ui.navigation-item :href="route('pengadaan.index')" :active="request()->routeIs('pengadaan.*')">Pengadaan</x-ui.navigation-item>
+                @endcan
+                @can('penerimaan.baca')
+                    <x-ui.navigation-item :href="route('penerimaan.index')" :active="request()->routeIs('penerimaan.*')">Penerimaan</x-ui.navigation-item>
+                @endcan
+                @can('administrasi')
+                    <x-ui.navigation-item :href="route('penjualan.index')" :active="request()->routeIs('penjualan.*')">Penjualan</x-ui.navigation-item>
+                    <x-ui.navigation-item :href="route('retur.index')" :active="request()->routeIs('retur.*')">Retur</x-ui.navigation-item>
+                @endcan
+                @can('kartu-stok.baca')
+                    <x-ui.navigation-item :href="route('kartu-stok.index')" :active="request()->routeIs('kartu-stok.*')">Kartu Stok</x-ui.navigation-item>
+                @endcan
+                @can('stok-barang.baca')
+                    <x-ui.navigation-item :href="route('stok-barang.index')" :active="request()->routeIs('stok-barang.*')">Stok Barang</x-ui.navigation-item>
+                @endcan
+
+                <x-slot:footer>
+                    <x-ui.divider />
+                    <x-ui.user-profile :username="auth()->user()->username" :role="auth()->user()->nama_role" />
+                </x-slot:footer>
+            </x-ui.app-sidebar>
+        @endauth
+
+        <div class="md3-app-content">
+            <x-ui.app-topbar :title="auth()->check() ? 'Sistem Persediaan' : null">
+                @guest
+                    <x-slot:leading>
+                        <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">SembaKu</a>
+                    </x-slot:leading>
+                @endguest
+                <x-slot:actions>
+                    @auth
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <x-ui.button variant="text" type="submit">Keluar</x-ui.button>
+                        </form>
+                    @else
+                        <x-ui.button variant="tonal" :href="route('login')">Masuk</x-ui.button>
+                    @endauth
+                </x-slot:actions>
+            </x-ui.app-topbar>
+
+            <x-ui.page-container class="md3-stack" id="konten-utama" tabindex="-1">
+                @hasSection('page-header')
+                    @yield('page-header')
+                @else
+                    <x-ui.page-header
+                        :title="html_entity_decode($__env->yieldContent('heading'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"
+                        :subtitle="html_entity_decode($__env->yieldContent('description'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"
+                    />
+                @endif
 
                 @yield('content')
-            </div>
-        </main>
+            </x-ui.page-container>
+        </div>
     </div>
 </body>
 </html>

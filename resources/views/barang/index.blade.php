@@ -1,79 +1,110 @@
 @extends('layouts.app')
 
 @section('title', 'Barang')
-@section('heading', 'Daftar Barang')
-@section('description', 'Data barang persediaan.')
+
+@section('page-header')
+    <x-ui.page-header title="Daftar Barang" subtitle="Data barang persediaan.">
+        <x-slot:actions>
+            <x-ui.button :href="route('barang.create')">
+                <x-slot:icon><x-ui.icon name="add" /></x-slot:icon>
+                Tambah Barang
+            </x-ui.button>
+        </x-slot:actions>
+    </x-ui.page-header>
+@endsection
 
 @section('content')
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-        </div>
-    @endif
+    @php
+        $perHalaman = 20;
+        $jumlahBarang = count($daftarBarang);
+        $halamanTerakhir = max(1, (int) ceil($jumlahBarang / $perHalaman));
+        $halamanAktif = min(\Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage(), $halamanTerakhir);
+        $halamanBarang = new \Illuminate\Pagination\LengthAwarePaginator(
+            array_slice($daftarBarang, ($halamanAktif - 1) * $perHalaman, $perHalaman),
+            $jumlahBarang,
+            $perHalaman,
+            $halamanAktif,
+            ['path' => request()->url()],
+        );
+        $halamanBarang->withQueryString();
+    @endphp
 
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <p class="mb-0">Jumlah data: <strong>{{ count($daftarBarang) }}</strong></p>
-        <a class="btn btn-primary" href="{{ route('barang.create') }}">Tambah Barang</a>
-    </div>
+    @if (session('success'))
+        <x-ui.snackbar variant="success">{{ session('success') }}</x-ui.snackbar>
+    @endif
 
     @if ($jumlahMarginAktif !== 1)
-        <p class="text-muted">{{ $jumlahMarginAktif === 0 ? 'Belum ada margin aktif.' : 'Ada lebih dari satu margin aktif.' }} Harga jual belum ditampilkan.</p>
+        <x-ui.alert variant="warning">
+            {{ $jumlahMarginAktif === 0 ? 'Belum ada margin aktif.' : 'Ada lebih dari satu margin aktif.' }} Harga jual belum ditampilkan.
+        </x-ui.alert>
     @endif
 
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle bg-white">
-            <thead class="table-light">
+    <x-ui.card variant="outlined">
+        <x-slot:header>
+            <span class="md3-type-label-large md3-muted">Jumlah data <strong>{{ $jumlahBarang }}</strong></span>
+        </x-slot:header>
+
+        <x-ui.table label="Daftar Barang">
+            <x-slot:head>
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Nama Barang</th>
                     <th scope="col">Jenis</th>
                     <th scope="col">Satuan</th>
-                    <th scope="col">Harga Beli Terakhir</th>
-                    <th scope="col">Harga Jual</th>
+                    <th scope="col" class="md3-table__numeric">Harga Beli Terakhir</th>
+                    <th scope="col" class="md3-table__numeric">Harga Jual</th>
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse ($daftarBarang as $barang)
-                    <tr>
-                        <td>{{ $barang->idbarang }}</td>
-                        <td>{{ $barang->nama }}</td>
-                        <td>{{ $barang->jenis === 'S' ? 'Sembako' : 'Rumah Tangga' }}</td>
-                        <td>{{ $barang->nama_satuan }}</td>
-                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-                        <td>{{ $barang->harga_jual === null ? '—' : 'Rp '.number_format($barang->harga_jual, 0, ',', '.') }}</td>
-                        <td>
-                            @if ($barang->status == 1)
-                                <span class="badge text-bg-success">Aktif</span>
-                            @else
-                                <span class="badge text-bg-secondary">Tidak Aktif</span>
-                            @endif
-                        </td>
-                        <td class="text-nowrap">
-                            <a class="btn btn-sm btn-outline-primary" href="{{ route('barang.edit', $barang->idbarang) }}">Edit</a>
+            </x-slot:head>
+            @forelse ($halamanBarang as $barang)
+                <tr>
+                    <td>{{ $barang->idbarang }}</td>
+                    <td>{{ $barang->nama }}</td>
+                    <td>{{ $barang->jenis === 'S' ? 'Sembako' : 'Rumah Tangga' }}</td>
+                    <td>{{ $barang->nama_satuan }}</td>
+                    <td class="md3-table__numeric">Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                    <td class="md3-table__numeric">{{ $barang->harga_jual === null ? '—' : 'Rp '.number_format($barang->harga_jual, 0, ',', '.') }}</td>
+                    <td>
+                        <x-ui.chip :variant="$barang->status == 1 ? 'success' : 'neutral'">
+                            {{ $barang->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                        </x-ui.chip>
+                    </td>
+                    <td>
+                        <div class="md3-cluster md3-table__actions">
+                            <x-ui.button variant="outlined" size="small" :href="route('barang.edit', $barang->idbarang)">Edit</x-ui.button>
 
                             @if ($barang->status == 1)
                                 <form
-                                    class="d-inline"
                                     method="POST"
                                     action="{{ route('barang.destroy', $barang->idbarang) }}"
                                     onsubmit="return confirm('Nonaktifkan barang ini?')"
                                 >
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">Nonaktifkan</button>
+                                    <x-ui.button variant="outlined" size="small" class="md3-action--error" type="submit">Nonaktifkan</x-ui.button>
                                 </form>
                             @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" class="text-center">Belum ada data barang.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8"><x-ui.empty-state title="Belum ada data barang." /></td>
+                </tr>
+            @endforelse
+        </x-ui.table>
+
+        @if ($halamanBarang->hasPages())
+            <x-ui.pagination label="Halaman daftar barang" class="md3-cluster">
+                <x-ui.button variant="outlined" size="small" :href="$halamanBarang->previousPageUrl()" :disabled="$halamanBarang->onFirstPage()">
+                    Sebelumnya
+                </x-ui.button>
+                <span class="md3-type-label-large">Halaman {{ $halamanBarang->currentPage() }} dari {{ $halamanBarang->lastPage() }}</span>
+                <x-ui.button variant="outlined" size="small" :href="$halamanBarang->nextPageUrl()" :disabled="! $halamanBarang->hasMorePages()">
+                    Berikutnya
+                </x-ui.button>
+            </x-ui.pagination>
+        @endif
+    </x-ui.card>
 @endsection

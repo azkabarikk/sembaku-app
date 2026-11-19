@@ -1,0 +1,74 @@
+.md3-type-display-large {
+    font: var(--md3-weight-regular) var(--md3-display-large) var(--md3-font);
+    letter-spacing: var(--md3-track-tight);
+}
+
+.md3-type-display-medium {
+    font: var(--md3-weight-regular) var(--md3-display-medium) var(--md3-font);
+    letter-spacing: var(--md3-track-none);
+}
+
+.md3-type-display-small {
+    font: var(--md3-weight-regular) var(--md3-display-small) var(--md3-font);
+    letter-spacing: var(--md3-track-none);
+}
+
+.md3-type-headline-large {
+    font: var(--md3-weight-regular) var(--md3-headline-large) var(--md3-font);
+    letter-spacing: var(--md3-track-none);
+}
+
+.md3-type-headline-medium {
+    font: var(--md3-weight-regular) var(--md3-headline-medium) var(--md3-font);
+    letter-spacing: var(--md3-track-none);
+}
+
+.md3-type-headline-small {
+    font: var(--md3-weight-regular) var(--md3-headline-small) var(--md3-font);
+    letter-spacing: var(--md3-track-none);
+}
+
+.md3-type-title-large {
+    font: var(--md3-weight-regular) var(--md3-title-large) var(--md3-font);
+    letter-spacing: var(--md3-track-none);
+}
+
+.md3-type-title-medium {
+    font: var(--md3-weight-medium) var(--md3-title-medium) var(--md3-font);
+    letter-spacing: var(--md3-track-15);
+}
+
+.md3-type-title-small {
+    font: var(--md3-weight-medium) var(--md3-title-small) var(--md3-font);
+    letter-spacing: var(--md3-track-10);
+}
+
+.md3-type-body-large {
+    font: var(--md3-weight-regular) var(--md3-body-large) var(--md3-font);
+    letter-spacing: var(--md3-track-50);
+}
+
+.md3-type-body-medium {
+    font: var(--md3-weight-regular) var(--md3-body-medium) var(--md3-font);
+    letter-spacing: var(--md3-track-25);
+}
+
+.md3-type-body-small {
+    font: var(--md3-weight-regular) var(--md3-body-small) var(--md3-font);
+    letter-spacing: var(--md3-track-40);
+}
+
+.md3-type-label-large {
+    font: var(--md3-weight-medium) var(--md3-label-large) var(--md3-font);
+    letter-spacing: var(--md3-track-10);
+}
+
+.md3-type-label-medium {
+    font: var(--md3-weight-medium) var(--md3-label-medium) var(--md3-font);
+    letter-spacing: var(--md3-track-50);
+}
+
+.md3-type-label-small {
+    font: var(--md3-weight-medium) var(--md3-label-small) var(--md3-font);
+    letter-spacing: var(--md3-track-50);
+}

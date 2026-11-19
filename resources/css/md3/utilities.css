@@ -1,0 +1,22 @@
+.md3-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--md3-space-8); }
+.md3-stack { display: grid; align-content: start; gap: var(--md3-space-16); min-inline-size: 0; }
+.md3-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--md3-space-16); }
+.md3-muted { color: var(--md3-on-surface-variant); }
+.md3-full-width { inline-size: 100%; }
+.md3-elevation-0 { background: var(--md3-tone-0); box-shadow: var(--md3-shadow-0); }
+.md3-elevation-1 { background: var(--md3-tone-1); box-shadow: var(--md3-shadow-1); }
+.md3-elevation-2 { background: var(--md3-tone-2); box-shadow: var(--md3-shadow-2); }
+.md3-elevation-3 { background: var(--md3-tone-3); box-shadow: var(--md3-shadow-3); }
+.md3-elevation-4 { background: var(--md3-tone-4); box-shadow: var(--md3-shadow-4); }
+.md3-elevation-5 { background: var(--md3-tone-5); box-shadow: var(--md3-shadow-5); }
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --md3-duration-quick: 0ms;
+        --md3-duration-standard: 0ms;
+        --md3-duration-enter: 0ms;
+        --md3-duration-exit: 0ms;
+    }
+    .md3-spinner, .md3-progress__track[data-indeterminate] > span { animation: none; }
+    .md3-progress__track[data-indeterminate] > span { left: 30%; }
+}
