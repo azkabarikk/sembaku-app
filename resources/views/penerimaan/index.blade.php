@@ -22,29 +22,6 @@
         <div class="alert alert-danger" role="alert">{{ $message }}</div>
     @enderror
 
-    @can('penerimaan.draf')
-    <form class="row g-2 align-items-end mb-3" method="GET" action="{{ route('penerimaan.pilih-pengadaan') }}">
-        <div class="col-sm-8 col-lg-6">
-            <label class="form-label" for="pilihPengadaan">Pengadaan yang bisa diterima</label>
-            <select class="form-select" id="pilihPengadaan" name="pengadaan" required @disabled($pengadaanTersisa === [])>
-                <option value="">Pilih pengadaan</option>
-                @foreach ($pengadaanTersisa as $pesanan)
-                    <option value="{{ $pesanan->idpengadaan }}" @selected($idPengadaan === (int) $pesanan->idpengadaan)>
-                        #{{ $pesanan->idpengadaan }} · {{ $pesanan->nama_vendor ?? '—' }} · Sisa {{ $pesanan->jumlah_sisa }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-auto">
-            <button class="btn btn-primary" type="submit" @disabled($pengadaanTersisa === [])>Terima Barang</button>
-        </div>
-    </form>
-    @if ($pengadaanTersisa === [])
-        <p class="text-muted mb-4">Tidak ada pengadaan yang masih menunggu barang.</p>
-    @endif
-
-    @endcan
-
     @if ($idPengadaan)
         <div class="d-flex align-items-center gap-3 mb-3">
             <a href="{{ route('pengadaan.show', $idPengadaan) }}">Pengadaan #{{ $idPengadaan }}</a>
@@ -52,7 +29,40 @@
         </div>
     @endif
 
-    <p class="mb-3">Jumlah data: <strong>{{ count($daftarPenerimaan) }}</strong></p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <p class="mb-0">Jumlah data: <strong>{{ count($daftarPenerimaan) }}</strong></p>
+        @can('penerimaan.draf')
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                data-bs-target="#formTambahPenerimaan" aria-controls="formTambahPenerimaan"
+                aria-expanded="false" @disabled($pengadaanTersisa === [])>
+                Tambah Penerimaan
+            </button>
+        @endcan
+    </div>
+
+    @can('penerimaan.draf')
+        <div class="collapse" id="formTambahPenerimaan">
+            <form class="row g-2 align-items-end mb-3" method="GET" action="{{ route('penerimaan.pilih-pengadaan') }}">
+                <div class="col-sm-8 col-lg-6">
+                    <label class="form-label" for="pilihPengadaan">Pengadaan yang bisa diterima</label>
+                    <select class="form-select" id="pilihPengadaan" name="pengadaan" required @disabled($pengadaanTersisa === [])>
+                        <option value="">Pilih pengadaan</option>
+                        @foreach ($pengadaanTersisa as $pesanan)
+                            <option value="{{ $pesanan->idpengadaan }}" @selected($idPengadaan === (int) $pesanan->idpengadaan)>
+                                #{{ $pesanan->idpengadaan }} · {{ $pesanan->nama_vendor ?? '—' }} · Sisa {{ $pesanan->jumlah_sisa }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" type="submit" @disabled($pengadaanTersisa === [])>Terima Barang</button>
+                </div>
+            </form>
+        </div>
+        @if ($pengadaanTersisa === [])
+            <p class="text-muted mb-4">Tidak ada pengadaan yang masih menunggu barang.</p>
+        @endif
+    @endcan
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered align-middle bg-white">
