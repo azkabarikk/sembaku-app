@@ -1,17 +1,17 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BarangController;
-use App\Http\Controllers\KartuStokController;
-use App\Http\Controllers\MarginPenjualanController;
-use App\Http\Controllers\PenerimaanController;
-use App\Http\Controllers\PengadaanController;
-use App\Http\Controllers\PenjualanController;
-use App\Http\Controllers\ReturController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SatuanController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\VendorController;
+use App\Http\Controllers\Master\BarangController;
+use App\Http\Controllers\Master\MarginPenjualanController;
+use App\Http\Controllers\Master\RoleController;
+use App\Http\Controllers\Master\SatuanController;
+use App\Http\Controllers\Master\UserController;
+use App\Http\Controllers\Master\VendorController;
+use App\Http\Controllers\Transaksi\KartuStokController;
+use App\Http\Controllers\Transaksi\PenerimaanController;
+use App\Http\Controllers\Transaksi\PengadaanController;
+use App\Http\Controllers\Transaksi\PenjualanController;
+use App\Http\Controllers\Transaksi\ReturController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
