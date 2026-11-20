@@ -4,22 +4,15 @@
 @section('heading', 'Masuk')
 
 @section('content')
-    <form method="POST" action="{{ route('login.store') }}">
-        @csrf
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input id="username" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username') }}" autocomplete="username" required>
-            @error('username')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input id="password" name="password" type="password" class="form-control @error('password') is-invalid @enderror" autocomplete="current-password" required>
-            @error('password')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-        <button type="submit" class="btn btn-primary">Masuk</button>
-    </form>
+    <x-ui.card variant="outlined" class="md3-form-card">
+        <form class="md3-stack" method="POST" action="{{ route('login.store') }}">
+            @csrf
+
+            <x-ui.text-field label="Username" id="username" name="username" autocomplete="username" required />
+
+            <x-ui.text-field label="Password" id="password" name="password" type="password" autocomplete="current-password" required />
+
+            <x-ui.button type="submit">Masuk</x-ui.button>
+        </form>
+    </x-ui.card>
 @endsection

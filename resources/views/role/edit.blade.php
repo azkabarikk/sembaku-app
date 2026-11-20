@@ -5,29 +5,17 @@
 @section('description', 'Perbarui nama role.')
 
 @section('content')
-    <form method="POST" action="{{ route('role.update', $role->idrole) }}">
-        @csrf
-        @method('PUT')
+    <x-ui.card variant="outlined" class="md3-form-card">
+        <form class="md3-stack" method="POST" action="{{ route('role.update', $role->idrole) }}">
+            @csrf
+            @method('PUT')
 
-        <div class="mb-3">
-            <label class="form-label" for="nama_role">Nama Role</label>
-            <input
-                class="form-control @error('nama_role') is-invalid @enderror"
-                id="nama_role"
-                name="nama_role"
-                type="text"
-                maxlength="100"
-                value="{{ old('nama_role', $role->nama_role) }}"
-                required
-            >
-            @error('nama_role')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
+            <x-ui.text-field label="Nama Role" id="nama_role" name="nama_role" type="text" maxlength="100" :value="$role->nama_role" required />
 
-        <div class="d-flex gap-2">
-            <button class="btn btn-primary" type="submit">Simpan Perubahan</button>
-            <a class="btn btn-secondary" href="{{ route('role.index') }}">Batal</a>
-        </div>
-    </form>
+            <div class="md3-cluster">
+                <x-ui.button variant="filled" type="submit">Simpan Perubahan</x-ui.button>
+                <x-ui.button variant="tonal" :href="route('role.index')">Batal</x-ui.button>
+            </div>
+        </form>
+    </x-ui.card>
 @endsection

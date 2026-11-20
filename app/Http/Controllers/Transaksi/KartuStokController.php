@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Transaksi;
 
+use App\Http\Controllers\Controller;
 use DateTimeImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;

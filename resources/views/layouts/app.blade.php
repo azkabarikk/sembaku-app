@@ -19,12 +19,12 @@
 
                 @can('administrasi')
                     <div class="md3-sidebar__group-label md3-type-label-medium">Master</div>
-                    <x-ui.navigation-item :href="route('barang.index')" :active="request()->routeIs('barang.*')">Barang</x-ui.navigation-item>
-                    <x-ui.navigation-item :href="route('satuan.index')" :active="request()->routeIs('satuan.*')">Satuan</x-ui.navigation-item>
-                    <x-ui.navigation-item :href="route('vendor.index')" :active="request()->routeIs('vendor.*')">Vendor</x-ui.navigation-item>
-                    <x-ui.navigation-item :href="route('role.index')" :active="request()->routeIs('role.*')">Role</x-ui.navigation-item>
-                    <x-ui.navigation-item :href="route('user.index')" :active="request()->routeIs('user.*')">User</x-ui.navigation-item>
-                    <x-ui.navigation-item :href="route('margin-penjualan.index')" :active="request()->routeIs('margin-penjualan.*')">Margin Penjualan</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="package" :href="route('barang.index')" :active="request()->routeIs('barang.*')">Barang</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="scale" :href="route('satuan.index')" :active="request()->routeIs('satuan.*')">Satuan</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="store" :href="route('vendor.index')" :active="request()->routeIs('vendor.*')">Vendor</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="shield" :href="route('role.index')" :active="request()->routeIs('role.*')">Role</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="person" :href="route('user.index')" :active="request()->routeIs('user.*')">User</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="percent" :href="route('margin-penjualan.index')" :active="request()->routeIs('margin-penjualan.*')">Margin Penjualan</x-ui.navigation-item>
                     <x-ui.divider class="md3-sidebar__divider" />
                 @endcan
 
@@ -32,20 +32,20 @@
                     <div class="md3-sidebar__group-label md3-type-label-medium">Transaksi dan stok</div>
                 @endcanany
                 @can('pengadaan.baca')
-                    <x-ui.navigation-item :href="route('pengadaan.index')" :active="request()->routeIs('pengadaan.*')">Pengadaan</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="shopping-cart" :href="route('pengadaan.index')" :active="request()->routeIs('pengadaan.*')">Pengadaan</x-ui.navigation-item>
                 @endcan
                 @can('penerimaan.baca')
-                    <x-ui.navigation-item :href="route('penerimaan.index')" :active="request()->routeIs('penerimaan.*')">Penerimaan</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="package-check" :href="route('penerimaan.index')" :active="request()->routeIs('penerimaan.*')">Penerimaan</x-ui.navigation-item>
                 @endcan
                 @can('administrasi')
-                    <x-ui.navigation-item :href="route('penjualan.index')" :active="request()->routeIs('penjualan.*')">Penjualan</x-ui.navigation-item>
-                    <x-ui.navigation-item :href="route('retur.index')" :active="request()->routeIs('retur.*')">Retur</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="receipt" :href="route('penjualan.index')" :active="request()->routeIs('penjualan.*')">Penjualan</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="rotate-left" :href="route('retur.index')" :active="request()->routeIs('retur.*')">Retur</x-ui.navigation-item>
                 @endcan
                 @can('kartu-stok.baca')
-                    <x-ui.navigation-item :href="route('kartu-stok.index')" :active="request()->routeIs('kartu-stok.*')">Kartu Stok</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="clipboard-list" :href="route('kartu-stok.index')" :active="request()->routeIs('kartu-stok.*')">Kartu Stok</x-ui.navigation-item>
                 @endcan
                 @can('stok-barang.baca')
-                    <x-ui.navigation-item :href="route('stok-barang.index')" :active="request()->routeIs('stok-barang.*')">Stok Barang</x-ui.navigation-item>
+                    <x-ui.navigation-item icon="warehouse" :href="route('stok-barang.index')" :active="request()->routeIs('stok-barang.*')">Stok Barang</x-ui.navigation-item>
                 @endcan
 
                 <x-slot:footer>
@@ -81,7 +81,11 @@
                     <x-ui.page-header
                         :title="html_entity_decode($__env->yieldContent('heading'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"
                         :subtitle="html_entity_decode($__env->yieldContent('description'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"
-                    />
+                    >
+                        @hasSection('page-actions')
+                            <x-slot:actions>@yield('page-actions')</x-slot:actions>
+                        @endif
+                    </x-ui.page-header>
                 @endif
 
                 @yield('content')

@@ -20,6 +20,36 @@
         @case('package')
             <rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16M9 6v4m6-4v4m-4 4h2"/>
             @break
+        @case('scale')
+            <path d="M12 3v18M5 6h14M7 6l-3 7h6L7 6Zm10 0-3 7h6l-3-7ZM8 21h8"/>
+            @break
+        @case('store')
+            <path d="M4 10v10h16V10M3 10l2-6h14l2 6M3 10a3 3 0 0 0 5 2 3 3 0 0 0 4 0 3 3 0 0 0 4 0 3 3 0 0 0 5-2M9 20v-5h6v5"/>
+            @break
+        @case('shield')
+            <path d="M12 3 5 6v5c0 4.8 2.9 8.1 7 10 4.1-1.9 7-5.2 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/>
+            @break
+        @case('percent')
+            <circle cx="7" cy="7" r="2.25"/><circle cx="17" cy="17" r="2.25"/><path d="m18.5 5.5-13 13"/>
+            @break
+        @case('shopping-cart')
+            <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"/><circle cx="9.5" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>
+            @break
+        @case('package-check')
+            <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m4.5 7.5 7.5 4 7.5-4M12 12v9m-3.5-7.5 2 2 4-4"/>
+            @break
+        @case('receipt')
+            <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6M9 12h6M9 16h4"/>
+            @break
+        @case('rotate-left')
+            <path d="M4 8v5h5M5 13a7 7 0 1 0 2-6"/>
+            @break
+        @case('clipboard-list')
+            <rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 10h.01M12 10h4M9 14h.01M12 14h4M9 18h.01M12 18h4"/>
+            @break
+        @case('warehouse')
+            <path d="m3 10 9-6 9 6v11H3V10Z"/><path d="M7 21v-7h10v7M7 17h10M9 10h.01M12 10h.01M15 10h.01"/>
+            @break
         @case('check')
             <path d="m5 12 4 4L19 6"/>
             @break
