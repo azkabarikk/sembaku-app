@@ -22,6 +22,7 @@
 
     <form class="md3-stack" method="POST" action="{{ route('penerimaan.store', $pengadaan->idpengadaan) }}">
         @csrf
+        <input type="hidden" name="penerimaan_terakhir" value="{{ $idTerakhir }}">
 
         <p class="md3-muted mb-2">Kosongkan harga untuk memakai harga yang tercatat pada pengadaan.</p>
 
@@ -80,7 +81,7 @@
         </x-ui.table>
 
         <div class="md3-cluster">
-            <x-ui.button variant="filled" type="submit">Simpan Draf</x-ui.button>
+            <x-ui.button variant="filled" type="submit">Simpan Penerimaan</x-ui.button>
             <x-ui.button variant="tonal" :href="route('penerimaan.index')">Batal</x-ui.button>
         </div>
     </form>

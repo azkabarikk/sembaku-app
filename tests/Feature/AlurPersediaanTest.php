@@ -69,6 +69,10 @@ class AlurPersediaanTest extends TestCase
         $this->assertSame([[12000, 72000], [14000, 28000]], array_map(static fn (object $baris): array => array_values((array) $baris), $harga));
         $this->assertSame($pencatat, DB::selectOne('SELECT user_iduser FROM pengadaan WHERE idpengadaan = ?', [$id])->user_iduser);
         $this->assertSame(0, $this->jumlahMutasi());
+        $this->get(route('pengadaan.edit', $id))->assertOk();
+        $this->delete(route('pengadaan.destroy', $id))->assertRedirect(route('pengadaan.index'));
+        $this->assertNull(DB::selectOne('SELECT idpengadaan FROM pengadaan WHERE idpengadaan = ?', [$id]));
+        $this->assertSame(0, (int) DB::selectOne('SELECT COUNT(*) AS jumlah FROM detail_pengadaan WHERE idpengadaan = ?', [$id])->jumlah);
         $this->post(route('logout'))->assertRedirect(route('login'));
         $this->assertGuest();
     }
@@ -85,73 +89,54 @@ class AlurPersediaanTest extends TestCase
         $this->assertTrue(Hash::check('PasswordLama!', $hash));
     }
 
-    public function test_draf_bertahap_konfirmasi_dan_saldo_stok(): void
+    public function test_penerimaan_bertahap_langsung_mencatat_stok_dan_harga(): void
     {
         $admin = $this->buatUser('Admin', 'admin');
         $gudang = $this->buatUser('Petugas Gudang', 'gudang');
-        $supervisor = $this->buatUser('Supervisor', 'supervisor');
         $this->masukSebagai($admin);
         $pengadaan = $this->buatPengadaan([$this->barang, $this->barangKedua], [10, 2]);
         DB::update('UPDATE barang SET harga = ? WHERE idbarang = ?', [18000, $this->barang]);
 
         $this->masukSebagai($gudang);
-        $this->get(route('penerimaan.create', $pengadaan))->assertOk()->assertSee('12000');
-        $pertama = $this->buatDraf($pengadaan, [$this->barang => 6], ['iduser' => $admin]);
-        $this->assertSame('D', $this->statusPenerimaan($pertama));
+        $this->get(route('penerimaan.create', $pengadaan))->assertOk()->assertSee('12000')->assertViewHas('idTerakhir', 0);
+        $input = ['iduser' => $admin, 'penerimaan_terakhir' => 0];
+        $pertama = $this->terimaBarang($pengadaan, [$this->barang => 3], $input);
+        $this->assertSame('K', $this->statusPenerimaan($pertama));
         $penerimaan = DB::selectOne('SELECT iduser FROM penerimaan WHERE idpenerimaan = ?', [$pertama]);
         $this->assertSame($gudang, $penerimaan->iduser);
-        $hargaTerima = DB::selectOne(
-            'SELECT harga_satuan_terima FROM detail_penerimaan WHERE idpenerimaan = ? AND barang_idbarang = ?',
-            [$pertama, $this->barang]
-        );
-        $this->assertSame(12000, $hargaTerima->harga_satuan_terima);
-        $this->put(route('penerimaan.update', $pertama), [
-            'jumlah_terima' => [$this->barang => 6],
-            'harga_satuan_terima' => [$this->barang => 19000],
-        ])->assertSessionHas('success');
-        $this->assertSame(18000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barang])->harga);
-        $this->assertSame(0, $this->jumlahMutasi());
-        $this->get(route('penerimaan.edit', $pertama))->assertOk();
-
-        $this->post(route('penerimaan.store', $pengadaan), ['jumlah_terima' => [$this->barang => 5]])
+        $this->assertSame(12000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barang])->harga);
+        $this->post(route('penerimaan.store', $pengadaan), [...$input, 'jumlah_terima' => [$this->barang => 3]])
+            ->assertSessionHasErrors('penerimaan');
+        $this->post(route('penerimaan.store', $pengadaan), ['jumlah_terima' => [$this->barang => 8]])
             ->assertSessionHasErrors('jumlah_terima.'.$this->barang);
-        $kedua = $this->buatDraf($pengadaan, [$this->barang => 4, $this->barangKedua => 2], [
+        $this->assertSame(1, $this->jumlahMutasi());
+
+        $this->masukSebagai($admin);
+        $this->delete(route('pengadaan.destroy', $pengadaan))->assertSessionHas('error');
+        $this->get(route('pengadaan.edit', $pengadaan))->assertForbidden();
+        $this->put(route('pengadaan.update', $pengadaan), [...$this->inputPengadaan([$this->barang], [20]), 'status' => 'A'])
+            ->assertSessionHasErrors('pengadaan');
+        $this->get(route('penerimaan.edit', $pertama))->assertForbidden();
+        $this->put(route('penerimaan.update', $pertama), ['jumlah_terima' => [$this->barang => 1]])->assertForbidden();
+        $this->delete(route('penerimaan.destroy', $pertama))->assertForbidden();
+        $this->post("/penerimaan/{$pertama}/konfirmasi")->assertNotFound();
+
+        $kedua = $this->terimaBarang($pengadaan, [$this->barang => 7, $this->barangKedua => 2], [
+            'penerimaan_terakhir' => $pertama,
             'harga_satuan_terima' => [$this->barang => 21000, $this->barangKedua => 15000],
         ]);
-        $this->post(route('penerimaan.confirm', $pertama))->assertForbidden();
-
-        $this->masukSebagai($supervisor);
-        $this->delete(route('pengadaan.destroy', $pengadaan))->assertSessionHas('error');
-        $this->post(route('penerimaan.confirm', $pertama))->assertSessionHas('success');
-        $this->assertSame('K', $this->statusPenerimaan($pertama));
-        $this->assertSame(19000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barang])->harga);
-        $this->assertSame(1, $this->jumlahMutasi());
-        $this->post(route('penerimaan.confirm', $pertama))->assertSessionHas('error');
-        $this->put(route('penerimaan.update', $pertama), ['jumlah_terima' => [$this->barang => 5]])->assertForbidden();
-        $this->delete(route('penerimaan.destroy', $pertama))->assertForbidden();
-        $this->assertSame(1, $this->jumlahMutasi());
-
-        $this->post(route('penerimaan.confirm', $kedua))->assertSessionHas('success');
         $this->get(route('penerimaan.show', $kedua))->assertOk()->assertSee('Terkonfirmasi');
         $this->assertSame(2, $this->jumlahMutasi());
+        $detail = DB::selectOne('SELECT harga_satuan_terima, sub_total_terima FROM detail_penerimaan WHERE idpenerimaan = ? AND barang_idbarang = ?', [$kedua, $this->barang]);
+        $this->assertSame([21000, 147000], array_values((array) $detail));
         $this->assertSame(21000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barang])->harga);
-        $this->assertSame(12000, DB::selectOne(
-            'SELECT harga_satuan FROM detail_pengadaan WHERE idpengadaan = ? AND idbarang = ?',
-            [$pengadaan, $this->barang]
-        )->harga_satuan);
-        $this->assertSame(19000, DB::selectOne(
-            'SELECT harga_satuan_terima FROM detail_penerimaan WHERE idpenerimaan = ?',
-            [$pertama]
-        )->harga_satuan_terima);
-        $saldo = DB::selectOne('SELECT stok FROM v_stok_barang WHERE idbarang = ?', [$this->barang]);
-        $terakhir = DB::selectOne('SELECT jenis_transaksi, stock FROM kartu_stok WHERE idbarang = ? ORDER BY idkartu_stok DESC LIMIT 1', [$this->barang]);
-        $this->assertSame('M', $terakhir->jenis_transaksi);
-        $this->assertSame(10, $terakhir->stock);
-        $this->assertSame(10, (int) $saldo->stok);
+        $this->assertSame(12000, DB::selectOne('SELECT harga_satuan FROM detail_pengadaan WHERE idpengadaan = ? AND idbarang = ?', [$pengadaan, $this->barang])->harga_satuan);
+        $mutasi = DB::selectOne('SELECT jenis_transaksi, masuk, keluar, stock FROM kartu_stok WHERE idbarang = ? AND idtransaksi = ?', [$this->barang, $kedua]);
+        $this->assertSame(['M', 7, 0, 10], array_values((array) $mutasi));
+        $this->assertSame(10, (int) DB::selectOne('SELECT stok FROM v_stok_barang WHERE idbarang = ?', [$this->barang])->stok);
         $this->get(route('kartu-stok.index', ['barang' => $this->barang, 'jenis' => 'M', 'tanggal' => date('Y-m-d')]))->assertOk();
         $this->get(route('stok-barang.index'))->assertOk()->assertSee('Total Masuk');
 
-        $this->masukSebagai($admin);
         $satuan = DB::selectOne('SELECT idsatuan FROM barang WHERE idbarang = ?', [$this->barang])->idsatuan;
         $this->put(route('barang.update', $this->barang), [
             'nama' => 'Barang baru namanya', 'jenis' => 'S', 'idsatuan' => $satuan, 'harga' => 1, 'status' => '1',
@@ -184,24 +169,29 @@ class AlurPersediaanTest extends TestCase
         $this->masukSebagai($gudang);
         $this->get(route('pengadaan.index'))->assertOk();
         $this->get(route('pengadaan.create'))->assertForbidden();
-        $id = $this->buatDraf($pengadaan, [$this->barang => 3]);
-        $this->put(route('penerimaan.update', $id), ['jumlah_terima' => [$this->barang => 4], 'harga_satuan_terima' => [$this->barang => 15000]])
-            ->assertSessionHas('success');
-        $this->assertSame(60000, DB::selectOne('SELECT sub_total_terima FROM detail_penerimaan WHERE idpenerimaan = ?', [$id])->sub_total_terima);
-        $this->assertSame(0, $this->jumlahMutasi());
-
+        $id = $this->drafLama($pengadaan, $gudang);
+        $this->get(route('penerimaan.edit', $id))->assertOk();
         $this->masukSebagai($petugasLain);
         $this->get(route('penerimaan.edit', $id))->assertForbidden();
+        $this->put(route('penerimaan.update', $id), ['jumlah_terima' => [$this->barang => 1]])->assertForbidden();
         $this->delete(route('penerimaan.destroy', $id))->assertForbidden();
+
         $this->masukSebagai($admin);
         $this->put(route('penerimaan.update', $id), [
-            'jumlah_terima' => [$this->barang => 2],
-            'iduser' => $admin,
+            'jumlah_terima' => [$this->barang => 2], 'harga_satuan_terima' => [$this->barang => 15000], 'iduser' => $admin,
         ])->assertSessionHas('success');
-        $this->assertSame($gudang, DB::selectOne('SELECT iduser FROM penerimaan WHERE idpenerimaan = ?', [$id])->iduser);
-        $this->delete(route('penerimaan.destroy', $id))->assertSessionHas('success');
-        $this->assertNull($this->statusPenerimaan($id));
-        $this->assertSame(0, (int) DB::selectOne('SELECT COUNT(*) AS jumlah FROM detail_penerimaan WHERE idpenerimaan = ?', [$id])->jumlah);
+        $hasil = DB::selectOne('SELECT iduser, status FROM penerimaan WHERE idpenerimaan = ?', [$id]);
+        $this->assertSame([$gudang, 'K'], array_values((array) $hasil));
+        $this->assertSame(1, $this->jumlahMutasi());
+        $this->assertSame(30000, DB::selectOne('SELECT sub_total_terima FROM detail_penerimaan WHERE idpenerimaan = ?', [$id])->sub_total_terima);
+        $this->put(route('penerimaan.update', $id), ['jumlah_terima' => [$this->barang => 2]])->assertForbidden();
+        $draf = $this->drafLama($pengadaan, $gudang);
+        $this->masukSebagai($gudang);
+        $this->delete(route('penerimaan.destroy', $draf))->assertSessionHas('success');
+        $this->assertNull($this->statusPenerimaan($draf));
+        $this->assertSame(0, (int) DB::selectOne('SELECT COUNT(*) AS jumlah FROM detail_penerimaan WHERE idpenerimaan = ?', [$draf])->jumlah);
+        $this->masukSebagai($staf);
+        $this->post(route('penerimaan.store', $pengadaan), ['jumlah_terima' => [$this->barang => 1]])->assertForbidden();
     }
 
     public function test_validasi_laravel_menolak_saldo_negatif_dan_barang_nonaktif(): void
@@ -209,10 +199,10 @@ class AlurPersediaanTest extends TestCase
         $admin = $this->buatUser('Admin', 'admin');
         $this->masukSebagai($admin);
         $pengadaan = $this->buatPengadaan([$this->barang], [2]);
-        $id = $this->buatDraf($pengadaan, [$this->barang => 1]);
+        $id = $this->drafLama($pengadaan, $admin);
 
         DB::update('UPDATE barang SET status = ? WHERE idbarang = ?', [0, $this->barang]);
-        $this->post(route('penerimaan.confirm', $id))->assertSessionHas('error', 'Barang penerimaan tidak ditemukan atau tidak aktif.');
+        $this->put(route('penerimaan.update', $id), ['jumlah_terima' => [$this->barang => 1]])->assertSessionHasErrors('penerimaan');
         $this->assertSame(0, $this->jumlahMutasi());
         DB::update('UPDATE barang SET status = ? WHERE idbarang = ?', [1, $this->barang]);
 
@@ -221,27 +211,26 @@ class AlurPersediaanTest extends TestCase
             ['B', 0, 2, $id, $this->barang]
         );
 
-        $this->post(route('penerimaan.confirm', $id))->assertSessionHas('error', "Saldo stok barang #{$this->barang} di luar batas yang didukung.");
+        $this->put(route('penerimaan.update', $id), ['jumlah_terima' => [$this->barang => 1]])->assertSessionHasErrors('penerimaan');
         $this->assertSame('D', $this->statusPenerimaan($id));
         $this->assertSame(1, $this->jumlahMutasi());
     }
 
-    public function test_konfirmasi_menolak_draf_kosong_dan_melebihi_pesanan(): void
+    public function test_penerimaan_menolak_jumlah_nol_dan_memperhitungkan_draf_lama(): void
     {
         $admin = $this->buatUser('Admin', 'admin');
         $this->masukSebagai($admin);
         $pengadaan = $this->buatPengadaan([$this->barang], [2]);
-        DB::insert('INSERT INTO penerimaan (status, idpengadaan, iduser) VALUES (?, ?, ?)', ['D', $pengadaan, $admin]);
-        $id = (int) DB::getPdo()->lastInsertId();
-
-        $this->post(route('penerimaan.confirm', $id))->assertSessionHas('error', 'Detail penerimaan masih kosong.');
-        DB::insert(
-            'INSERT INTO detail_penerimaan (idpenerimaan, barang_idbarang, jumlah_terima, harga_satuan_terima, sub_total_terima) VALUES (?, ?, ?, ?, ?)',
-            [$id, $this->barang, 3, 12000, 36000]
-        );
-        $this->post(route('penerimaan.confirm', $id))->assertSessionHas('error', 'Jumlah terima tidak valid atau melebihi pesanan.');
+        $id = $this->drafLama($pengadaan, $admin);
+        $this->post(route('penerimaan.store', $pengadaan), ['jumlah_terima' => [$this->barang => 0]])->assertSessionHasErrors('jumlah_terima');
+        $this->post(route('penerimaan.store', $pengadaan), ['jumlah_terima' => [$this->barang => 2]])->assertSessionHasErrors('jumlah_terima.'.$this->barang);
         $this->assertSame('D', $this->statusPenerimaan($id));
         $this->assertSame(0, $this->jumlahMutasi());
+        DB::insert('INSERT INTO kartu_stok (jenis_transaksi, masuk, keluar, idtransaksi, idbarang) VALUES (?, ?, 0, ?, ?)', ['P', 1, $id, $this->barang]);
+        $this->put(route('penerimaan.update', $id), ['jumlah_terima' => [$this->barang => 1]])->assertSessionHasErrors('penerimaan');
+        $this->delete(route('penerimaan.destroy', $id))->assertSessionHasErrors('penerimaan');
+        $this->assertSame('D', $this->statusPenerimaan($id));
+        $this->assertSame(1, $this->jumlahMutasi());
     }
 
     public function test_kegagalan_penyimpanan_mengembalikan_stok_harga_dan_status(): void
@@ -249,9 +238,7 @@ class AlurPersediaanTest extends TestCase
         $admin = $this->buatUser('Admin', 'admin');
         $this->masukSebagai($admin);
         $pengadaan = $this->buatPengadaan([$this->barang, $this->barangKedua], [1, 1]);
-        $id = $this->buatDraf($pengadaan, [$this->barang => 1, $this->barangKedua => 1], [
-            'harga_satuan_terima' => [$this->barang => 17500, $this->barangKedua => 15500],
-        ]);
+
         $kegagalanTerjadi = false;
 
         DB::connection()->beforeExecuting(function (string $sql, array $bindings, Connection $connection) use (&$kegagalanTerjadi): void {
@@ -262,10 +249,14 @@ class AlurPersediaanTest extends TestCase
             }
         });
 
-        $this->post(route('penerimaan.confirm', $id))->assertSessionHas('error');
+        $this->post(route('penerimaan.store', $pengadaan), [
+            'jumlah_terima' => [$this->barang => 1, $this->barangKedua => 1],
+            'harga_satuan_terima' => [$this->barang => 17500, $this->barangKedua => 15500],
+        ])->assertSessionHasErrors('penerimaan');
         $this->assertTrue($kegagalanTerjadi);
-        $this->assertSame('D', $this->statusPenerimaan($id));
-        $this->assertSame(0, (int) DB::selectOne('SELECT COUNT(*) AS jumlah FROM kartu_stok WHERE jenis_transaksi = ? AND idtransaksi = ?', ['M', $id])->jumlah);
+        $this->assertNull(DB::selectOne('SELECT idpenerimaan FROM penerimaan WHERE idpengadaan = ?', [$pengadaan]));
+        $this->assertSame(0, (int) DB::selectOne('SELECT COUNT(*) AS jumlah FROM detail_penerimaan WHERE barang_idbarang IN (?, ?)', [$this->barang, $this->barangKedua])->jumlah);
+        $this->assertSame(0, $this->jumlahMutasi());
         $this->assertSame(12000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barang])->harga);
         $this->assertSame(14000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barangKedua])->harga);
     }
@@ -376,8 +367,8 @@ class AlurPersediaanTest extends TestCase
         $this->get(route('penerimaan.show', $lama['N']))->assertOk()->assertSee('Dibatalkan (lama)');
         $this->post(route('penerimaan.store', $pengadaan), ['jumlah_terima' => [$this->barang => 6]])
             ->assertSessionHasErrors('jumlah_terima.'.$this->barang);
-        $id = $this->buatDraf($pengadaan, [$this->barang => 5]);
-        $this->post(route('penerimaan.confirm', $id))->assertSessionHas('success');
+        $id = $this->terimaBarang($pengadaan, [$this->barang => 5]);
+        $this->assertSame('K', $this->statusPenerimaan($id));
         $this->assertSame('A', $this->statusPenerimaan($lama['A']));
         $this->assertSame('N', $this->statusPenerimaan($lama['N']));
         $this->assertSame(10, (int) DB::selectOne('SELECT stok FROM v_stok_barang WHERE idbarang = ?', [$this->barang])->stok);
@@ -417,7 +408,19 @@ class AlurPersediaanTest extends TestCase
         return $id;
     }
 
-    private function buatDraf(int $pengadaan, array $jumlah, array $tambahan = []): int
+    private function drafLama(int $pengadaan, int $pembuat): int
+    {
+        DB::insert('INSERT INTO penerimaan (status, idpengadaan, iduser) VALUES (?, ?, ?)', ['D', $pengadaan, $pembuat]);
+        $id = (int) DB::getPdo()->lastInsertId();
+        DB::insert(
+            'INSERT INTO detail_penerimaan (idpenerimaan, barang_idbarang, jumlah_terima, harga_satuan_terima, sub_total_terima) VALUES (?, ?, ?, ?, ?)',
+            [$id, $this->barang, 1, 12000, 12000]
+        );
+
+        return $id;
+    }
+
+    private function terimaBarang(int $pengadaan, array $jumlah, array $tambahan = []): int
     {
         $response = $this->post(route('penerimaan.store', $pengadaan), ['jumlah_terima' => $jumlah, ...$tambahan]);
         $response->assertSessionHas('success');

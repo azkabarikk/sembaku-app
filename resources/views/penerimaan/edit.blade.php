@@ -2,7 +2,7 @@
 
 @section('title', 'Edit Penerimaan')
 @section('heading', 'Edit Penerimaan')
-@section('description', 'Perbarui jumlah dan harga pada draf penerimaan.')
+@section('description', 'Periksa jumlah dan harga. Menyimpan draf akan menambah stok dan mengunci penerimaan.')
 
 @section('content')
     @if ($errors->has('penerimaan'))
@@ -83,7 +83,7 @@
         </x-ui.table>
 
         <div class="md3-cluster">
-            <x-ui.button variant="filled" type="submit">Simpan Perubahan</x-ui.button>
+            <x-ui.button variant="filled" type="submit">Simpan Penerimaan</x-ui.button>
             <x-ui.button variant="tonal" :href="route('penerimaan.index')">Kembali</x-ui.button>
         </div>
     </form>

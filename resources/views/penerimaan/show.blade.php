@@ -60,14 +60,7 @@
         @can('penerimaan.ubah-draf', $penerimaan)
             <x-ui.button variant="outlined" :href="route('penerimaan.edit', $penerimaan->idpenerimaan)">Edit</x-ui.button>
         @endcan
-        @if ($penerimaan->status === 'D')
-            @can('penerimaan.konfirmasi')
-                <form method="POST" action="{{ route('penerimaan.confirm', $penerimaan->idpenerimaan) }}" onsubmit="return confirm('Konfirmasi penerimaan dan masukkan barang ke stok?')">
-                    @csrf
-                    <x-ui.button variant="filled" type="submit">Konfirmasi</x-ui.button>
-                </form>
-            @endcan
-        @else
+        @if ($penerimaan->status !== 'D')
             <x-ui.button variant="outlined" :href="route('kartu-stok.index', ['penerimaan' => $penerimaan->idpenerimaan])">Kartu Stok</x-ui.button>
         @endif
     </div>
