@@ -11,6 +11,8 @@ use Illuminate\View\View;
 
 class KartuStokController extends Controller
 {
+    // Membaca filter barang, penerimaan, jenis transaksi, dan tanggal untuk menyaring mutasi stok
+    // Halaman kartu stok menampilkan mutasi terbaru lebih dulu, sebanyak 50 baris per halaman
     public function index(Request $request): View
     {
         $idBarang = filter_var($request->query('barang'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ?: null;
@@ -75,6 +77,8 @@ class KartuStokController extends Controller
         ]);
     }
 
+    // Menjumlahkan stok masuk dan keluar per barang, lalu mengambil saldo dari mutasi terakhir
+    // Halaman ringkasan menampilkan kedua saldo, termasuk nilai nol untuk barang tanpa mutasi
     public function ringkasan(): View
     {
         $stok = DB::select(
@@ -96,6 +100,8 @@ class KartuStokController extends Controller
         return view('kartu_stok.ringkasan', ['stok' => $stok]);
     }
 
+    // Membaca tanggal dalam format tahun-bulan-hari dan mencocokkannya kembali dengan masukan
+    // Hasilnya benar hanya jika tanggal tersebut ada di kalender dan formatnya tepat
     private function tanggalValid(string $tanggal): bool
     {
         $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $tanggal);

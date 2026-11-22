@@ -10,6 +10,8 @@ use Illuminate\View\View;
 
 class BarangController extends Controller
 {
+    // Membaca barang dari v_master_barang dan memakai fn_harga_jual untuk menghitung harga jual
+    // Persentase hanya diambil jika tepat satu margin aktif, lalu hasilnya dikirim ke daftar barang
     public function index(): View
     {
         $marginAktif = DB::select(
@@ -31,6 +33,7 @@ class BarangController extends Controller
         ]);
     }
 
+    // Mengambil satuan aktif dari v_master_satuan sebagai pilihan pada formulir tambah barang
     public function create(): View
     {
         $daftarSatuan = DB::select(
@@ -46,6 +49,8 @@ class BarangController extends Controller
         ]);
     }
 
+    // Memvalidasi data barang dan harga awal, lalu memeriksa apakah satuan yang dipilih masih aktif
+    // Jika sesuai, barang disimpan dan pengguna kembali ke daftar barang
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -89,6 +94,8 @@ class BarangController extends Controller
             ->with('success', 'Barang berhasil ditambahkan.');
     }
 
+    // Mencari barang berdasarkan ID dan mengembalikan 404 jika barang tidak ditemukan
+    // Formulir menampilkan data barang, pilihan satuan, dan penanda harga terkunci berdasarkan riwayat penerimaan
     public function edit(int $id): View
     {
         $barang = DB::selectOne(
@@ -115,6 +122,9 @@ class BarangController extends Controller
         ]);
     }
 
+    // Memvalidasi input dan mengunci barang selama perubahan disimpan dalam satu transaksi
+    // Harga lama dipertahankan jika barang sudah diterima, sedangkan penggantian satuan harus memakai satuan aktif
+    // Setelah data tersimpan, pengguna kembali ke daftar barang
     public function update(Request $request, int $id): RedirectResponse
     {
         $validated = $request->validate([
@@ -157,6 +167,8 @@ class BarangController extends Controller
         }, 3);
     }
 
+    // Memeriksa keberadaan barang, lalu mengubah statusnya menjadi nonaktif
+    // Pengguna kembali ke daftar barang dengan pesan berhasil
     public function destroy(int $id): RedirectResponse
     {
         $barang = DB::selectOne(
@@ -182,6 +194,8 @@ class BarangController extends Controller
             ->with('success', 'Barang berhasil dinonaktifkan.');
     }
 
+    // Memeriksa apakah barang tercatat pada penerimaan berstatus K atau A
+    // Hasilnya menentukan apakah harga beli barang dikunci saat pengeditan
     private function memilikiPenerimaan(int $id): bool
     {
         return DB::selectOne(

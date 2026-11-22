@@ -445,6 +445,15 @@ textarea.md3-control { min-block-size: calc(2 * var(--md3-space-48)); resize: ve
 .md3-sidebar__divider { margin-block: var(--md3-space-8); }
 .md3-sidebar__footer { margin-block-start: var(--md3-space-20); }
 .md3-topbar { padding: var(--md3-space-8) var(--md3-space-24); min-block-size: var(--md3-space-64); background: var(--md3-surface); color: var(--md3-on-surface); }
+.md3-app-bar { flex-wrap: nowrap; border-bottom: var(--md3-border) solid var(--md3-outline-variant); }
+.md3-app-bar .md3-app-brand { font-weight: 700; }
+.md3-app-bar > .md3-cluster { flex-wrap: nowrap; min-inline-size: 0; }
+.md3-app-bar .md3-user-profile { min-inline-size: 0; padding: 0; }
+.md3-app-bar .md3-app-bar__menu { display: none; }
+.md3-app-bar + .md3-app-frame { min-block-size: calc(100dvh - var(--md3-space-64)); }
+@media (min-width: 48.001rem) {
+    .md3-app-bar + .md3-app-frame > .md3-sidebar { block-size: calc(100dvh - var(--md3-space-64)); }
+}
 .md3-navigation-item {
     --md3-action-ink: var(--md3-on-surface-variant);
     display: flex;
@@ -474,6 +483,9 @@ textarea.md3-control { min-block-size: calc(2 * var(--md3-space-48)); resize: ve
 .md3-page-container { box-sizing: border-box; inline-size: 100%; max-inline-size: var(--md3-page-width); margin-inline: auto; padding: var(--md3-space-24); }
 
 @media (max-width: 48rem) {
+    .md3-app-bar { gap: var(--md3-space-8); }
+    .md3-app-bar .md3-app-bar__menu:not([hidden]) { display: inline-flex; }
+    .md3-app-bar:has(.md3-app-bar__menu[aria-expanded="false"]) + .md3-app-frame > .md3-sidebar { display: none; }
     .md3-app-frame { grid-template-columns: minmax(0, 1fr); align-content: start; }
     .md3-sidebar {
         position: static;
@@ -490,4 +502,10 @@ textarea.md3-control { min-block-size: calc(2 * var(--md3-space-48)); resize: ve
     .md3-sidebar__body { grid-column: 1 / -1; }
     .md3-sidebar__toggle[aria-expanded="false"] + .md3-sidebar__body { display: none; }
     .md3-topbar, .md3-page-container { padding-inline: var(--md3-space-16); }
+}
+
+@media (max-width: 30rem) {
+    .md3-topbar.md3-app-bar { padding-inline: var(--md3-space-8); }
+    .md3-app-bar > .md3-cluster { gap: var(--md3-space-4); }
+    .md3-app-bar .md3-user-profile__avatar { display: none; }
 }

@@ -10,6 +10,7 @@ use Illuminate\View\View;
 
 class RoleController extends Controller
 {
+    // Mengambil nama role dari v_master_role dan menampilkannya menurut urutan ID
     public function index(): View
     {
         $daftarRole = DB::select(
@@ -23,11 +24,14 @@ class RoleController extends Controller
         ]);
     }
 
+    // Menampilkan formulir untuk mengisi nama role baru
     public function create(): View
     {
         return view('role.create');
     }
 
+    // Memastikan nama role terisi dan panjangnya paling banyak 100 karakter
+    // Nama disimpan ke tabel role, lalu pengguna kembali ke daftar role
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -45,6 +49,7 @@ class RoleController extends Controller
             ->with('success', 'Role berhasil ditambahkan.');
     }
 
+    // Mencari role berdasarkan ID untuk mengisi formulir edit atau menampilkan 404 jika tidak ditemukan
     public function edit(int $id): View
     {
         $role = DB::selectOne(
@@ -63,6 +68,8 @@ class RoleController extends Controller
         ]);
     }
 
+    // Memvalidasi nama baru dan memastikan ID role terdaftar sebelum memperbarui namanya
+    // Setelah tersimpan, pengguna kembali ke daftar role
     public function update(Request $request, int $id): RedirectResponse
     {
         $validated = $request->validate([
@@ -92,6 +99,8 @@ class RoleController extends Controller
             ->with('success', 'Role berhasil diperbarui.');
     }
 
+    // Memastikan role ada dan memeriksa apakah masih ada pengguna yang memakainya
+    // Role yang masih dipakai dipertahankan dengan pesan alasan, sedangkan role yang bebas dihapus sebelum kembali ke daftar
     public function destroy(int $id): RedirectResponse
     {
         $role = DB::selectOne(

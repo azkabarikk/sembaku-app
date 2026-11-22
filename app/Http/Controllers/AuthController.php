@@ -12,11 +12,15 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
+    // Menampilkan formulir masuk dengan username dan kata sandi
     public function create(): View
     {
         return view('auth.login');
     }
 
+    // Memvalidasi username dan kata sandi, lalu membatasi percobaan masuk berdasarkan username dan alamat IP
+    // Jika autentikasi berhasil, penghitung percobaan dihapus dan ID sesi diperbarui
+    // Pengguna diarahkan ke halaman yang semula dituju atau ke stok barang
     public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
@@ -41,6 +45,7 @@ class AuthController extends Controller
         return redirect()->intended(route('stok-barang.index'));
     }
 
+    // Mengeluarkan pengguna, mengakhiri sesi, dan membuat token CSRF baru sebelum kembali ke halaman masuk
     public function destroy(Request $request): RedirectResponse
     {
         Auth::logout();

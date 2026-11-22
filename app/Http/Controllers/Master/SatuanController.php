@@ -10,6 +10,7 @@ use Illuminate\View\View;
 
 class SatuanController extends Controller
 {
+    // Membaca nama dan status dari v_master_satuan untuk menampilkan daftar satuan menurut urutan ID
     public function index(): View
     {
         $daftarSatuan = DB::select(
@@ -23,11 +24,14 @@ class SatuanController extends Controller
         ]);
     }
 
+    // Menampilkan formulir untuk mengisi nama dan status satuan baru
     public function create(): View
     {
         return view('satuan.create');
     }
 
+    // Memvalidasi nama dan status satuan, lalu menyimpannya ke tabel satuan
+    // Pengguna kembali ke daftar satuan setelah data tersimpan
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -49,6 +53,7 @@ class SatuanController extends Controller
             ->with('success', 'Satuan berhasil ditambahkan.');
     }
 
+    // Mencari satuan berdasarkan ID untuk mengisi formulir edit atau menampilkan 404 jika tidak ditemukan
     public function edit(int $id): View
     {
         $satuan = DB::selectOne(
@@ -67,6 +72,8 @@ class SatuanController extends Controller
         ]);
     }
 
+    // Memvalidasi nama dan status baru serta memastikan satuan terdaftar
+    // Perubahan disimpan berdasarkan ID, lalu pengguna kembali ke daftar satuan
     public function update(Request $request, int $id): RedirectResponse
     {
         $validated = $request->validate([
@@ -101,6 +108,8 @@ class SatuanController extends Controller
             ->with('success', 'Satuan berhasil diperbarui.');
     }
 
+    // Memastikan satuan terdaftar, lalu mengubah statusnya menjadi nonaktif
+    // Pengguna kembali ke daftar satuan dengan pesan berhasil
     public function destroy(int $id): RedirectResponse
     {
         $satuan = DB::selectOne(

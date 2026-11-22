@@ -12,6 +12,7 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    // Membaca username dan role dari v_master_user untuk ditampilkan menurut urutan ID pengguna
     public function index(): View
     {
         $daftarUser = DB::select(
@@ -25,6 +26,7 @@ class UserController extends Controller
         ]);
     }
 
+    // Mengambil daftar role dari v_master_role menurut nama untuk pilihan pada formulir tambah pengguna
     public function create(): View
     {
         $daftarRole = DB::select(
@@ -38,6 +40,8 @@ class UserController extends Controller
         ]);
     }
 
+    // Memvalidasi isian dan konfirmasi kata sandi, lalu memastikan username tersedia dan role terdaftar
+    // Kata sandi disimpan dalam bentuk hash sebelum pengguna diarahkan ke daftar akun
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -92,6 +96,8 @@ class UserController extends Controller
             ->with('success', 'User berhasil ditambahkan.');
     }
 
+    // Mencari akun berdasarkan ID dan mengembalikan 404 jika akun tidak ditemukan
+    // Formulir edit menampilkan username, role saat ini, dan pilihan role yang tersedia
     public function edit(int $id): View
     {
         $user = DB::selectOne(
@@ -117,6 +123,9 @@ class UserController extends Controller
         ]);
     }
 
+    // Memastikan akun ada, username tidak dipakai akun lain, dan role yang dipilih terdaftar
+    // Jika kata sandi baru diisi dan konfirmasinya cocok, hash kata sandi ikut diperbarui
+    // Setelah perubahan tersimpan, pengguna kembali ke daftar akun
     public function update(Request $request, int $id): RedirectResponse
     {
         $validated = $request->validate([
@@ -198,6 +207,8 @@ class UserController extends Controller
             ->with('success', 'User berhasil diperbarui.');
     }
 
+    // Mencari akun berdasarkan ID, lalu mencoba menghapusnya
+    // Pengguna kembali ke daftar akun dengan pesan berhasil atau pemberitahuan jika akun masih terkait transaksi
     public function destroy(int $id): RedirectResponse
     {
         $user = DB::selectOne(

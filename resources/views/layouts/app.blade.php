@@ -10,13 +10,30 @@
 <body class="md3">
     <x-ui.button href="#konten-utama" class="md3-skip-link">Lewati navigasi</x-ui.button>
 
+    <x-ui.app-topbar class="md3-app-bar">
+        <x-slot:leading>
+            @auth
+                <x-ui.icon-button label="Navigasi utama" icon="menu" class="md3-app-bar__menu"
+                    aria-controls="mainNavigation" aria-expanded="true" data-md3-disclosure hidden />
+            @endauth
+            <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">SembaKu</a>
+        </x-slot:leading>
+        <x-slot:actions>
+            @auth
+                <x-ui.user-profile :username="auth()->user()->username" :role="auth()->user()->nama_role" />
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <x-ui.button variant="text" type="submit">Keluar</x-ui.button>
+                </form>
+            @else
+                <x-ui.button variant="tonal" :href="route('login')">Masuk</x-ui.button>
+            @endauth
+        </x-slot:actions>
+    </x-ui.app-topbar>
+
     <div @class(['md3-app-frame', 'md3-app-frame--guest' => auth()->guest()])>
         @auth
-            <x-ui.app-sidebar id="mainNavigation">
-                <x-slot:brand>
-                    <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">SembaKu</a>
-                </x-slot:brand>
-
+            <x-ui.app-sidebar id="mainNavigation" :internal-toggle="false">
                 @can('administrasi')
                     <div class="md3-sidebar__group-label md3-type-label-medium">Master</div>
                     <x-ui.navigation-item icon="package" :href="route('barang.index')" :active="request()->routeIs('barang.*')">Barang</x-ui.navigation-item>
@@ -48,32 +65,10 @@
                     <x-ui.navigation-item icon="warehouse" :href="route('stok-barang.index')" :active="request()->routeIs('stok-barang.*')">Stok Barang</x-ui.navigation-item>
                 @endcan
 
-                <x-slot:footer>
-                    <x-ui.divider />
-                    <x-ui.user-profile :username="auth()->user()->username" :role="auth()->user()->nama_role" />
-                </x-slot:footer>
             </x-ui.app-sidebar>
         @endauth
 
         <div class="md3-app-content">
-            <x-ui.app-topbar :title="auth()->check() ? 'Sistem Persediaan' : null">
-                @guest
-                    <x-slot:leading>
-                        <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">SembaKu</a>
-                    </x-slot:leading>
-                @endguest
-                <x-slot:actions>
-                    @auth
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-ui.button variant="text" type="submit">Keluar</x-ui.button>
-                        </form>
-                    @else
-                        <x-ui.button variant="tonal" :href="route('login')">Masuk</x-ui.button>
-                    @endauth
-                </x-slot:actions>
-            </x-ui.app-topbar>
-
             <x-ui.page-container class="md3-stack" id="konten-utama" tabindex="-1">
                 @hasSection('page-header')
                     @yield('page-header')

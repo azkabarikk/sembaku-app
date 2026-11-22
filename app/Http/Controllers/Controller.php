@@ -2,7 +2,5 @@
 
 namespace App\Http\Controllers;
 
-abstract class Controller
-{
-    //
-}
+// Kelas dasar yang diwarisi oleh controller SembaKu
+abstract class Controller {}
