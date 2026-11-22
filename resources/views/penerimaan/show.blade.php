@@ -64,14 +64,7 @@
         @can('penerimaan.ubah-draf', $penerimaan)
             <a class="btn btn-outline-primary" href="{{ route('penerimaan.edit', $penerimaan->idpenerimaan) }}">Edit</a>
         @endcan
-        @if ($penerimaan->status === 'D')
-            @can('penerimaan.konfirmasi')
-                <form method="POST" action="{{ route('penerimaan.confirm', $penerimaan->idpenerimaan) }}" onsubmit="return confirm('Konfirmasi penerimaan dan masukkan barang ke stok?')">
-                    @csrf
-                    <button class="btn btn-primary" type="submit">Konfirmasi</button>
-                </form>
-            @endcan
-        @else
+        @if ($penerimaan->status !== 'D')
             <a class="btn btn-outline-secondary" href="{{ route('kartu-stok.index', ['penerimaan' => $penerimaan->idpenerimaan]) }}">Kartu Stok</a>
         @endif
     </div>

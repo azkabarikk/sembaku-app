@@ -8,8 +8,8 @@ use App\Http\Controllers\Master\SatuanController;
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Transaksi\KartuStokController;
-use App\Http\Controllers\Transaksi\PenerimaanController;
-use App\Http\Controllers\Transaksi\PengadaanController;
+use App\Http\Controllers\Transaksi\Penerimaan\PenerimaanController;
+use App\Http\Controllers\Transaksi\Pengadaan\PengadaanController;
 use App\Http\Controllers\Transaksi\PenjualanController;
 use App\Http\Controllers\Transaksi\ReturController;
 use Illuminate\Support\Facades\Route;
@@ -87,11 +87,6 @@ Route::middleware('auth')->group(function (): void {
         ->whereNumber('id')
         ->middleware('can:penerimaan.baca')
         ->name('penerimaan.show');
-
-    Route::post('/penerimaan/{id}/konfirmasi', [PenerimaanController::class, 'confirm'])
-        ->whereNumber('id')
-        ->middleware('can:penerimaan.konfirmasi')
-        ->name('penerimaan.confirm');
 
     Route::get('/kartu-stok', [KartuStokController::class, 'index'])
         ->middleware('can:kartu-stok.baca')

@@ -22,6 +22,7 @@
 
     <form method="POST" action="{{ route('penerimaan.store', $pengadaan->idpengadaan) }}">
         @csrf
+        <input type="hidden" name="penerimaan_terakhir" value="{{ $idTerakhir }}">
 
         <p class="text-muted mb-2">Kosongkan harga untuk memakai harga yang tercatat pada pengadaan.</p>
 
@@ -83,7 +84,7 @@
         </div>
 
         <div class="d-flex gap-2">
-            <button class="btn btn-primary" type="submit">Simpan Draf</button>
+            <button class="btn btn-primary" type="submit">Simpan Penerimaan</button>
             <a class="btn btn-secondary" href="{{ route('penerimaan.index') }}">Batal</a>
         </div>
     </form>

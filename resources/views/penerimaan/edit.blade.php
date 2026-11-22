@@ -2,7 +2,7 @@
 
 @section('title', 'Edit Penerimaan')
 @section('heading', 'Edit Penerimaan')
-@section('description', 'Perbarui jumlah dan harga pada draf penerimaan.')
+@section('description', 'Periksa jumlah dan harga. Menyimpan draf akan menambah stok dan mengunci penerimaan.')
 
 @section('content')
     @if ($errors->has('penerimaan'))
@@ -86,7 +86,7 @@
         </div>
 
         <div class="d-flex gap-2">
-            <button class="btn btn-primary" type="submit">Simpan Perubahan</button>
+            <button class="btn btn-primary" type="submit">Simpan Penerimaan</button>
             <a class="btn btn-secondary" href="{{ route('penerimaan.index') }}">Kembali</a>
         </div>
     </form>
