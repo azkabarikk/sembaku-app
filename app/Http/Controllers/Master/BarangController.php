@@ -10,24 +10,17 @@ use Illuminate\View\View;
 
 class BarangController extends Controller
 {
+    // Mengambil daftar barang beserta harganya dari view v_master_barang untuk ditampilkan menurut urutan ID
     public function index(): View
     {
-        $marginAktif = DB::select(
-            'SELECT persen FROM margin_penjualan WHERE status = ? ORDER BY idmargin_penjualan LIMIT 2',
-            [1]
-        );
-        $persenMargin = count($marginAktif) === 1 ? $marginAktif[0]->persen : null;
-
         $daftarBarang = DB::select(
-            'SELECT idbarang, nama, jenis, nama_satuan, harga, status, fn_harga_jual(harga, ?) AS harga_jual
+            'SELECT idbarang, nama, jenis, nama_satuan, harga, status
              FROM v_master_barang
-             ORDER BY idbarang',
-            [$persenMargin]
+             ORDER BY idbarang'
         );
 
         return view('barang.index', [
             'daftarBarang' => $daftarBarang,
-            'jumlahMarginAktif' => count($marginAktif),
         ]);
     }
 
