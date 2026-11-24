@@ -33,12 +33,6 @@
         <x-ui.snackbar variant="success">{{ session('success') }}</x-ui.snackbar>
     @endif
 
-    @if ($jumlahMarginAktif !== 1)
-        <x-ui.alert variant="warning">
-            {{ $jumlahMarginAktif === 0 ? 'Belum ada margin aktif.' : 'Ada lebih dari satu margin aktif.' }} Harga jual belum ditampilkan.
-        </x-ui.alert>
-    @endif
-
     <x-ui.card variant="outlined">
         <x-slot:header>
             <span class="md3-type-label-large md3-muted">Jumlah data <strong>{{ $jumlahBarang }}</strong></span>
@@ -51,8 +45,7 @@
                     <th scope="col">Nama Barang</th>
                     <th scope="col">Jenis</th>
                     <th scope="col">Satuan</th>
-                    <th scope="col" class="md3-table__numeric">Harga Beli Terakhir</th>
-                    <th scope="col" class="md3-table__numeric">Harga Jual</th>
+                    <th scope="col" class="md3-table__numeric">Harga Barang</th>
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
                 </tr>
@@ -64,7 +57,6 @@
                     <td>{{ $barang->jenis === 'S' ? 'Sembako' : 'Rumah Tangga' }}</td>
                     <td>{{ $barang->nama_satuan }}</td>
                     <td class="md3-table__numeric">Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-                    <td class="md3-table__numeric">{{ $barang->harga_jual === null ? '—' : 'Rp '.number_format($barang->harga_jual, 0, ',', '.') }}</td>
                     <td>
                         <x-ui.chip :variant="$barang->status == 1 ? 'success' : 'neutral'">
                             {{ $barang->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
@@ -90,7 +82,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8"><x-ui.empty-state title="Belum ada data barang." /></td>
+                    <td colspan="7"><x-ui.empty-state title="Belum ada data barang." /></td>
                 </tr>
             @endforelse
         </x-ui.table>

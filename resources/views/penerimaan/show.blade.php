@@ -55,6 +55,15 @@
         @endforelse
     </x-ui.table>
 
+    <dl class="md3-record">
+        <dt>Subtotal Pengadaan</dt>
+        <dd>Rp {{ number_format($penerimaan->subtotal_pengadaan, 0, ',', '.') }}</dd>
+        <dt>PPN (11%)</dt>
+        <dd>Rp {{ number_format($penerimaan->ppn_pengadaan, 0, ',', '.') }}</dd>
+        <dt>Total Pengadaan</dt>
+        <dd>Rp {{ number_format($penerimaan->total_pengadaan, 0, ',', '.') }}</dd>
+    </dl>
+
     <div class="md3-cluster">
         <x-ui.button variant="tonal" :href="route('penerimaan.index')">Kembali</x-ui.button>
         @can('penerimaan.ubah-draf', $penerimaan)

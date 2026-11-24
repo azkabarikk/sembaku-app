@@ -24,7 +24,8 @@ class PenerimaanQuery
     public function headerDetail(int $id): ?object
     {
         return DB::selectOne(
-            'SELECT p.idpenerimaan, p.created_at, p.status, p.idpengadaan, p.iduser, v.nama_vendor, u.username
+            'SELECT p.idpenerimaan, p.created_at, p.status, p.idpengadaan, p.iduser, v.nama_vendor, u.username,
+                    pg.subtotal_nilai AS subtotal_pengadaan, pg.ppn AS ppn_pengadaan, pg.total_nilai AS total_pengadaan
              FROM penerimaan p
              JOIN pengadaan pg ON pg.idpengadaan = p.idpengadaan
              LEFT JOIN v_master_vendor v ON v.idvendor = pg.vendor_idvendor

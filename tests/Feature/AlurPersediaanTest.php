@@ -261,7 +261,7 @@ class AlurPersediaanTest extends TestCase
         $this->assertSame(14000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barangKedua])->harga);
     }
 
-    public function test_harga_jual_mengikuti_margin_aktif_tanpa_mengubah_harga_master(): void
+    public function test_daftar_barang_menampilkan_harga_master_saat_margin_aktif_berubah(): void
     {
         $admin = $this->buatUser('Admin', 'admin');
         $this->masukSebagai($admin);
@@ -271,8 +271,8 @@ class AlurPersediaanTest extends TestCase
             ->assertRedirect(route('margin-penjualan.index'));
         $marginPertama = DB::selectOne('SELECT idmargin_penjualan FROM margin_penjualan WHERE status = ? AND iduser = ?', [1, $admin]);
         $this->assertNotNull($marginPertama);
-        $this->get(route('barang.index'))->assertOk()->assertSee('Rp 11.200')
-            ->assertViewHas('daftarBarang', fn (array $daftar): bool => (int) (array_column($daftar, 'harga_jual', 'idbarang')[$this->barang] ?? 0) === 11200);
+        $this->get(route('barang.index'))->assertOk()->assertSee('Harga Barang')->assertDontSee('Harga Jual')
+            ->assertSee('Rp 10.000');
 
         $this->post(route('margin-penjualan.store'), ['persen' => 20, 'status' => '0'])
             ->assertRedirect(route('margin-penjualan.index'));
@@ -281,8 +281,8 @@ class AlurPersediaanTest extends TestCase
             ->assertRedirect(route('margin-penjualan.index'));
         $aktif = DB::select('SELECT idmargin_penjualan FROM margin_penjualan WHERE status = ?', [1]);
         $this->assertSame([$marginKedua->id], array_column($aktif, 'idmargin_penjualan'));
-        $this->get(route('barang.index'))->assertOk()->assertSee('Rp 12.000')
-            ->assertViewHas('daftarBarang', fn (array $daftar): bool => (int) (array_column($daftar, 'harga_jual', 'idbarang')[$this->barang] ?? 0) === 12000);
+        $this->get(route('barang.index'))->assertOk()->assertSee('Rp 10.000')
+            ->assertViewHas('daftarBarang', fn (array $daftar): bool => (int) (array_column($daftar, 'harga', 'idbarang')[$this->barang] ?? 0) === 10000);
         $this->assertSame(10000, DB::selectOne('SELECT harga FROM barang WHERE idbarang = ?', [$this->barang])->harga);
     }
 

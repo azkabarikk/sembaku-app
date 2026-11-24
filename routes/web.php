@@ -95,12 +95,19 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/stok-barang', [KartuStokController::class, 'ringkasan'])
         ->middleware('can:stok-barang.baca')
         ->name('stok-barang.index');
+
+    Route::get('/penjualan', [PenjualanController::class, 'index'])
+        ->middleware('can:penjualan.kelola')
+        ->block(60, 15)
+        ->name('penjualan.index');
+
+    Route::post('/penjualan', [PenjualanController::class, 'store'])
+        ->middleware('can:penjualan.kelola')
+        ->block(60, 15)
+        ->name('penjualan.store');
 });
 
 Route::middleware(['auth', 'can:administrasi'])->group(function (): void {
-    Route::get('/penjualan', [PenjualanController::class, 'index'])
-        ->name('penjualan.index');
-
     Route::get('/retur', [ReturController::class, 'index'])
         ->name('retur.index');
 

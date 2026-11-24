@@ -45,7 +45,7 @@
                     <x-ui.divider class="md3-sidebar__divider" />
                 @endcan
 
-                @canany(['pengadaan.baca', 'penerimaan.baca', 'administrasi', 'kartu-stok.baca', 'stok-barang.baca'])
+                @canany(['pengadaan.baca', 'penerimaan.baca', 'penjualan.kelola', 'administrasi', 'kartu-stok.baca', 'stok-barang.baca'])
                     <div class="md3-sidebar__group-label md3-type-label-medium">Transaksi dan stok</div>
                 @endcanany
                 @can('pengadaan.baca')
@@ -54,8 +54,10 @@
                 @can('penerimaan.baca')
                     <x-ui.navigation-item icon="package-check" :href="route('penerimaan.index')" :active="request()->routeIs('penerimaan.*')">Penerimaan</x-ui.navigation-item>
                 @endcan
-                @can('administrasi')
+                @can('penjualan.kelola')
                     <x-ui.navigation-item icon="receipt" :href="route('penjualan.index')" :active="request()->routeIs('penjualan.*')">Penjualan</x-ui.navigation-item>
+                @endcan
+                @can('administrasi')
                     <x-ui.navigation-item icon="rotate-left" :href="route('retur.index')" :active="request()->routeIs('retur.*')">Retur</x-ui.navigation-item>
                 @endcan
                 @can('kartu-stok.baca')
@@ -87,5 +89,6 @@
             </x-ui.page-container>
         </div>
     </div>
+    @stack('scripts')
 </body>
 </html>
