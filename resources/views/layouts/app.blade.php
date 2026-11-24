@@ -57,10 +57,12 @@
                                 <a class="nav-link {{ request()->routeIs('penerimaan.*') ? 'active' : '' }}" href="{{ route('penerimaan.index') }}">Penerimaan</a>
                             </li>
                         @endcan
-                        @can('administrasi')
+                        @can('penjualan.kelola')
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('penjualan.*') ? 'active' : '' }}" href="{{ route('penjualan.index') }}">Penjualan</a>
                             </li>
+                        @endcan
+                        @can('administrasi')
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('retur.*') ? 'active' : '' }}" href="{{ route('retur.index') }}">Retur</a>
                             </li>
@@ -116,5 +118,6 @@
             </div>
         </main>
     </div>
+    @stack('scripts')
 </body>
 </html>

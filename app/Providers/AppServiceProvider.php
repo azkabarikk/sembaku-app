@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
             'pengadaan.kelola' => ['Admin', 'Staf Pengadaan', 'Supervisor'],
             'penerimaan.baca' => ['Admin', 'Petugas Gudang', 'Staf Pengadaan', 'Supervisor'],
             'penerimaan.draf' => ['Admin', 'Petugas Gudang', 'Supervisor'],
+            'penjualan.kelola' => ['Admin', 'Kasir'],
             'kartu-stok.baca' => ['Admin', 'Petugas Gudang', 'Staf Pengadaan', 'Supervisor'],
             'stok-barang.baca' => ['Admin', 'Kasir', 'Petugas Gudang', 'Staf Pengadaan', 'Supervisor'],
         ];

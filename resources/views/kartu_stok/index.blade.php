@@ -25,6 +25,7 @@
                     <option value="{{ $kode }}" @selected($jenis === $kode)>{{ match ($kode) {
                         'M', 'P' => 'Penerimaan ('.$kode.')',
                         'B' => 'Koreksi Penerimaan (B)',
+                        'J' => 'Penjualan (J)',
                         default => $kode,
                     } }}</option>
                 @endforeach
@@ -70,6 +71,7 @@
                         <td>{{ match ($baris->jenis_transaksi) {
                             'M', 'P' => 'Penerimaan',
                             'B' => 'Koreksi Penerimaan',
+                            'J' => 'Penjualan',
                             default => $baris->jenis_transaksi,
                         } }}</td>
                         <td>
