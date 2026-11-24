@@ -59,6 +59,15 @@
         </table>
     </div>
 
+    <dl class="row">
+        <dt class="col-sm-3">Subtotal Pengadaan</dt>
+        <dd class="col-sm-9">Rp {{ number_format($penerimaan->subtotal_pengadaan, 0, ',', '.') }}</dd>
+        <dt class="col-sm-3">PPN (11%)</dt>
+        <dd class="col-sm-9">Rp {{ number_format($penerimaan->ppn_pengadaan, 0, ',', '.') }}</dd>
+        <dt class="col-sm-3">Total Pengadaan</dt>
+        <dd class="col-sm-9">Rp {{ number_format($penerimaan->total_pengadaan, 0, ',', '.') }}</dd>
+    </dl>
+
     <div class="d-flex flex-wrap gap-2">
         <a class="btn btn-secondary" href="{{ route('penerimaan.index') }}">Kembali</a>
         @can('penerimaan.ubah-draf', $penerimaan)
