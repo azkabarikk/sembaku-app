@@ -16,9 +16,7 @@
         <x-ui.snackbar variant="success">{{ session('success') }}</x-ui.snackbar>
     @endif
 
-    <p class="md3-type-label-large md3-muted mb-0">Jumlah data: <strong>{{ count($daftarSatuan) }}</strong></p>
-
-    <x-ui.table label="Daftar Satuan">
+    <x-ui.data-table label="Daftar Satuan" :filters="['Status' => 2]">
         <x-slot:head>
             <tr>
                 <th scope="col">ID</th>
@@ -60,5 +58,5 @@
                 <td colspan="4" class="text-center">Belum ada data satuan.</td>
             </tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 @endsection

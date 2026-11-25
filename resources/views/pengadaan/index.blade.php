@@ -21,9 +21,7 @@
         <x-ui.snackbar variant="error">{{ session('error') }}</x-ui.snackbar>
     @endif
 
-    <p class="md3-type-label-large md3-muted mb-0">Jumlah data: <strong>{{ count($daftarPengadaan) }}</strong></p>
-
-    <x-ui.table label="Daftar Pengadaan">
+    <x-ui.data-table label="Daftar Pengadaan" :filters="['Vendor' => 2, 'Tanggal' => 1, 'Status penerimaan' => 7]">
         <x-slot:head>
             <tr>
                 <th scope="col">ID</th>
@@ -50,17 +48,19 @@
                 <td>Rp {{ number_format($pengadaan->ppn, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($pengadaan->total_nilai, 0, ',', '.') }}</td>
                 <td>
-                    @if ($jumlah['dipesan'] === 0)
-                        Belum ada rincian
-                    @elseif ($jumlah['sisa'] === 0)
-                        Lengkap
-                    @elseif ($pengadaan->status !== 'A')
-                        Tidak bisa diterima
-                    @elseif ($jumlah['sisa'] < $jumlah['dipesan'])
-                        Sebagian
-                    @else
-                        Belum diterima
-                    @endif
+                    <span data-filter-label>
+                        @if ($jumlah['dipesan'] === 0)
+                            Belum ada rincian
+                        @elseif ($jumlah['sisa'] === 0)
+                            Lengkap
+                        @elseif ($pengadaan->status !== 'A')
+                            Tidak bisa diterima
+                        @elseif ($jumlah['sisa'] < $jumlah['dipesan'])
+                            Sebagian
+                        @else
+                            Belum diterima
+                        @endif
+                    </span>
                     @if ($jumlah['sisa'] > 0)
                         <span class="d-block md3-muted">Sisa {{ $jumlah['sisa'] }} dari {{ $jumlah['dipesan'] }}</span>
                     @endif
@@ -90,5 +90,5 @@
                 <td colspan="9" class="text-center">Belum ada data pengadaan.</td>
             </tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 @endsection

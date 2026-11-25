@@ -30,7 +30,7 @@
         } }}</dd>
     </dl>
 
-    <x-ui.table label="Detail Penerimaan">
+    <x-ui.data-table label="Detail Penerimaan">
         <x-slot:head>
             <tr>
                 <th scope="col">Barang</th>
@@ -53,7 +53,7 @@
         @empty
             <tr><td colspan="6" class="text-center">Belum ada rincian barang.</td></tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 
     <dl class="md3-record">
         <dt>Subtotal Pengadaan</dt>

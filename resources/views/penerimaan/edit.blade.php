@@ -24,7 +24,7 @@
         @csrf
         @method('PUT')
 
-        <x-ui.table label="Edit Penerimaan">
+        <x-ui.data-table label="Edit Penerimaan">
             <x-slot:head>
                 <tr>
                     <th scope="col">Barang</th>
@@ -80,7 +80,7 @@
                     <td colspan="7" class="text-center">Tidak ada barang yang masih dapat diterima.</td>
                 </tr>
             @endforelse
-        </x-ui.table>
+        </x-ui.data-table>
 
         <div class="md3-cluster">
             <x-ui.button variant="filled" type="submit">Simpan Penerimaan</x-ui.button>

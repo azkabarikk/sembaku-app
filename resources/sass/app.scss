@@ -1,21 +1,6 @@
 @import 'variables';
 @import 'bootstrap/scss/bootstrap';
 
-.pos-product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.25rem), 1fr));
-    gap: .375rem;
-
-    > button {
-        aspect-ratio: 1;
-        width: 100%;
-    }
-
-    > p {
-        grid-column: 1 / -1;
-    }
-}
-
 .app-layout {
     display: flex;
     min-height: 100vh;

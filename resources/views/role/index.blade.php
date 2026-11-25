@@ -20,9 +20,7 @@
         <x-ui.snackbar variant="error">{{ session('error') }}</x-ui.snackbar>
     @endif
 
-    <p class="md3-type-label-large md3-muted mb-0">Jumlah data: <strong>{{ count($daftarRole) }}</strong></p>
-
-    <x-ui.table label="Daftar Role">
+    <x-ui.data-table label="Daftar Role">
         <x-slot:head>
             <tr>
                 <th scope="col">ID</th>
@@ -53,5 +51,5 @@
                 <td colspan="3" class="text-center">Belum ada data role.</td>
             </tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 @endsection

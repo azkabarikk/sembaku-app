@@ -425,7 +425,39 @@ textarea.md3-control { min-block-size: calc(2 * var(--md3-space-48)); resize: ve
 .md3-app-content { min-inline-size: 0; }
 .md3-skip-link { position: absolute; z-index: 10; inset-inline-start: var(--md3-space-16); }
 .md3-skip-link:not(:focus) { clip-path: inset(50%); }
-.md3-app-brand { display: inline-flex; border-radius: var(--md3-shape-xs); padding: var(--md3-space-4); text-decoration: none; }
+.md3-app-brand {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--md3-space-4);
+    border-radius: var(--md3-shape-xs);
+    padding: var(--md3-space-4);
+    text-decoration: none;
+}
+.md3-app-brand .md3-icon { color: var(--md3-primary); }
+.md3-card.md3-login-card {
+    inline-size: min(100%, 27rem);
+    margin-inline: auto;
+    margin-block-start: clamp(1rem, 8vh, 5rem);
+    padding: clamp(1.25rem, 5vw, 2rem);
+    gap: var(--md3-space-24);
+}
+.md3-login-heading {
+    display: grid;
+    justify-items: center;
+    gap: var(--md3-space-16);
+    text-align: center;
+}
+.md3-login-heading h1 { margin: 0; }
+.md3-login-icon {
+    display: grid;
+    place-items: center;
+    inline-size: var(--md3-space-48);
+    block-size: var(--md3-space-48);
+    border-radius: var(--md3-shape-md);
+    background: var(--md3-primary-container);
+    color: var(--md3-on-primary-container);
+}
 .md3-sidebar {
     position: sticky;
     inset-block-start: 0;

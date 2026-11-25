@@ -20,3 +20,15 @@
     .md3-spinner, .md3-progress__track[data-indeterminate] > span { animation: none; }
     .md3-progress__track[data-indeterminate] > span { left: 30%; }
 }
+.md3-data-list [hidden] { display: none !important; }
+.md3-data-list { min-width: 0; }
+.md3-data-toolbar, .md3-data-footer, .md3-data-footer [data-pager] {
+    display: flex; flex-wrap: wrap; align-items: end; gap: var(--md3-space-12);
+}
+.md3-data-toolbar > :is(.md3-search-field, .md3-pos-search) { flex: 1 1 15rem; min-width: 0; }
+.md3-data-toolbar > .md3-field { max-width: 100%; min-width: 0; }
+.md3-data-footer { justify-content: space-between; align-items: center; }
+.md3-data-footer [data-pager] { align-items: center; margin: 0; }
+@media (max-width: 37.5rem) {
+    .md3-data-toolbar > :is(.md3-search-field, .md3-pos-search) { flex-basis: 100%; }
+}

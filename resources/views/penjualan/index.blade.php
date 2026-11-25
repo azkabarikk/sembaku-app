@@ -2,100 +2,126 @@
 
 @section('title', 'Penjualan')
 @section('heading', 'Penjualan')
-@section('description', 'Pilih barang dan selesaikan pembayaran pelanggan.')
 
 @section('content')
     @if (session('success'))
-        <div class="alert alert-success" role="status">
-            <strong>{{ session('success') }}</strong>
+        <x-ui.alert variant="success" :title="session('success')">
             @if (session()->has('bukti_pembayaran.kembalian'))
                 @php($bukti = session('bukti_pembayaran'))
-                <dl class="row mb-0 mt-2">
-                    <dt class="col-sm-3">Total pembayaran</dt>
-                    <dd class="col-sm-9">Rp {{ number_format($bukti['total'], 0, ',', '.') }}</dd>
-                    <dt class="col-sm-3">Uang diterima</dt>
-                    <dd class="col-sm-9">Rp {{ number_format($bukti['uang_diterima'], 0, ',', '.') }}</dd>
-                    <dt class="col-sm-3">Kembalian</dt>
-                    <dd class="col-sm-9 mb-0">Rp {{ number_format($bukti['kembalian'], 0, ',', '.') }}</dd>
+                <dl class="md3-pos-summary">
+                    <dt>Total pembayaran</dt><dd>Rp {{ number_format($bukti['total'], 0, ',', '.') }}</dd>
+                    <dt>Uang diterima</dt><dd>Rp {{ number_format($bukti['uang_diterima'], 0, ',', '.') }}</dd>
+                    <dt>Kembalian</dt><dd>Rp {{ number_format($bukti['kembalian'], 0, ',', '.') }}</dd>
                 </dl>
             @endif
-        </div>
+        </x-ui.alert>
     @endif
 
     @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <strong>Pembayaran belum dapat diproses</strong>
-            <ul class="mb-0">
+        <x-ui.alert variant="error" title="Pembayaran belum dapat diproses">
+            <ul>
                 @foreach (array_unique($errors->all()) as $pesan)
                     <li>{{ $pesan }}</li>
                 @endforeach
             </ul>
-        </div>
+        </x-ui.alert>
     @endif
 
     @unless ($margin)
-        <div class="alert alert-warning" role="alert">Penjualan memerlukan tepat satu margin aktif.</div>
+        <x-ui.alert variant="warning">Penjualan memerlukan tepat satu margin aktif.</x-ui.alert>
     @endunless
 
-    <div class="row g-3">
-        <section class="col-12 col-lg-7" aria-labelledby="catalog-title">
-            <div class="card">
-                <h2 class="card-header h5" id="catalog-title">Pilih barang</h2>
-                <div class="card-body">
-                    <label class="form-label" for="product-search">Cari nama atau ID barang</label>
-                    <input class="form-control mb-3" id="product-search" type="search" autocomplete="off">
-                    <div class="pos-product-grid">
+    <div class="md3-pos" data-mobile-panel="{{ $errors->any() ? 'cart' : 'catalog' }}">
+        <section aria-labelledby="catalog-title">
+            <x-ui.card variant="outlined">
+                <x-slot:header><h2 id="catalog-title" class="md3-type-title-large">Pilih barang</h2></x-slot:header>
+                <x-ui.data-list label="Katalog barang" empty-id="search-empty">
+                    <x-slot:search>
+                        <div class="md3-pos-search">
+                            <x-ui.search-field label="Cari barang" id="product-search" data-search placeholder="Cari nama atau ID barang..." autocomplete="off" />
+                            <x-ui.icon name="search" class="md3-pos-search-icon" />
+                            <x-ui.icon-button id="clear-search" icon="close" label="Hapus pencarian" size="small" hidden />
+                        </div>
+                    </x-slot:search>
+                    <div class="md3-pos-products">
                         @forelse ($daftarBarang as $barang)
-                            <button class="btn btn-light border rounded text-start d-flex flex-column justify-content-center align-items-start p-2 text-break" type="button"
+                            <button class="md3-action md3-pos-product" type="button"
                                 data-product-card data-id="{{ $barang->idbarang }}" data-name="{{ $barang->nama }}"
                                 data-unit="{{ $barang->nama_satuan }}" data-price="{{ $barang->harga_jual }}"
                                 data-stock="{{ $barang->stok }}" @disabled($barang->stok < 1)>
-                                <small class="text-muted">#{{ $barang->idbarang }}</small>
-                                <strong>{{ $barang->nama }}</strong>
-                                <small>Stok {{ $barang->stok }} {{ $barang->nama_satuan }}</small>
-                                <span class="fw-semibold">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</span>
+                                <span class="md3-pos-product-meta md3-type-label-medium md3-muted">
+                                    #{{ $barang->idbarang }}
+                                    @if ($barang->stok >= 1)
+                                        <x-ui.icon name="add" class="md3-pos-add" />
+                                    @endif
+                                </span>
+                                <strong class="md3-type-title-medium">{{ $barang->nama }}</strong>
+                                <span class="md3-type-body-small md3-muted">{{ $barang->stok < 1 ? 'Stok habis' : 'Stok '.$barang->stok.' '.$barang->nama_satuan }}</span>
+                                <strong class="md3-pos-price">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</strong>
                             </button>
                         @empty
-                            <p class="text-muted mb-0">Belum ada barang yang dapat dijual.</p>
+                            <x-ui.empty-state title="Belum ada barang yang dapat dijual" />
                         @endforelse
                     </div>
-                    <p class="text-muted mb-0 d-none" id="search-empty" role="status">Barang tidak ditemukan.</p>
-                </div>
-            </div>
+                </x-ui.data-list>
+            </x-ui.card>
         </section>
-        <aside class="col-12 col-lg-5" aria-labelledby="cart-title">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0" id="cart-title">Keranjang</h2>
-                    <span class="badge text-bg-secondary" id="cart-count">0 item</span>
-                </div>
-                <form class="card-body" method="POST" action="{{ route('penjualan.store') }}" id="payment-form">
+
+        <x-ui.button id="open-cart" class="md3-pos-mobile-action" aria-controls="pos-cart-panel"
+            aria-expanded="{{ $errors->any() ? 'true' : 'false' }}">
+            <x-slot:icon><x-ui.icon name="shopping-cart" /></x-slot:icon>
+            Lihat keranjang · <span id="mobile-count">0 item</span>
+        </x-ui.button>
+        <aside id="pos-cart-panel" aria-labelledby="cart-title">
+            <x-ui.card variant="outlined">
+                <x-slot:header>
+                    <div class="md3-pos-between">
+                        <h2 class="md3-type-title-large" id="cart-title" tabindex="-1">Keranjang</h2>
+                        <x-ui.badge id="cart-count">0 item</x-ui.badge>
+                        <x-ui.button size="small" variant="text" id="back-to-catalog" class="md3-pos-mobile-action">Kembali ke katalog</x-ui.button>
+                    </div>
+                </x-slot:header>
+                <form class="md3-stack" method="POST" action="{{ route('penjualan.store') }}" id="payment-form">
                     @csrf
                     <input type="hidden" name="token_pembayaran" value="{{ $tokenPembayaran }}">
-                    <div id="cart-items"></div>
-                    <p class="text-muted" id="empty-cart">Keranjang masih kosong.</p>
-                    <dl class="row mb-3">
-                        <dt class="col-6 fw-normal">Subtotal</dt><dd class="col-6 text-end" id="subtotal-value">Rp 0</dd>
-                        <dt class="col-6 fw-normal">PPN {{ $persenPpn }}%</dt><dd class="col-6 text-end" id="tax-value">Rp 0</dd>
-                        <dt class="col-6">Total</dt><dd class="col-6 text-end fw-bold" id="total-value">Rp 0</dd>
+                    <div id="cart-items" role="region" aria-label="Barang dalam keranjang" tabindex="0"></div>
+                    <x-ui.empty-state id="empty-cart" icon="shopping-cart" title="Keranjang masih kosong"
+                        description="Pilih barang dari katalog untuk menambahkannya ke keranjang." />
+                    <dl class="md3-pos-summary">
+                        <dt>Subtotal</dt><dd id="subtotal-value">Rp 0</dd>
+                        <dt>PPN {{ $persenPpn }}%</dt><dd id="tax-value">Rp 0</dd>
+                        <dt class="md3-pos-total">Total</dt><dd class="md3-pos-total md3-type-title-large" id="total-value">Rp 0</dd>
                     </dl>
-                    <label class="form-label" for="cash">Uang diterima</label>
-                    <div class="input-group mb-2">
-                        <span class="input-group-text">Rp</span>
-                        <input class="form-control @error('uang_diterima') is-invalid @enderror" id="cash" name="uang_diterima"
-                            type="number" inputmode="numeric" min="0" step="1" required
-                            value="{{ is_scalar(old('uang_diterima')) ? old('uang_diterima') : '' }}">
-                    </div>
-                    <p class="d-flex justify-content-between" aria-live="polite">
+                    <x-ui.text-field id="cash" name="uang_diterima" label="Uang diterima (Rp)" type="number"
+                        inputmode="numeric" min="0" step="1" required />
+                    <div class="md3-pos-between" aria-live="polite">
                         <span id="change-label">Kembalian</span><strong id="change-value">—</strong>
-                    </p>
-                    <button class="btn btn-primary w-100" id="payment-button" type="submit" disabled>
+                    </div>
+                    <x-ui.button id="payment-button" type="submit" full-width disabled>
                         <span>Proses Pembayaran</span>
-                    </button>
+                    </x-ui.button>
                 </form>
-            </div>
+            </x-ui.card>
         </aside>
     </div>
+
+    <template id="cart-line">
+        <div class="md3-pos-line">
+            <div class="md3-pos-between">
+                <strong data-name></strong><strong data-subtotal></strong>
+            </div>
+            <span class="md3-muted md3-type-body-small" data-price></span>
+            <div class="md3-pos-between">
+                <div class="md3-cluster">
+                    <x-ui.button variant="tonal" size="small" class="md3-icon-button" data-decrease>−</x-ui.button>
+                    <input type="number" min="1" class="md3-control md3-pos-quantity" data-quantity>
+                    <x-ui.button variant="tonal" size="small" class="md3-icon-button" data-increase>+</x-ui.button>
+                </div>
+                <x-ui.button variant="text" size="small" data-remove>Hapus</x-ui.button>
+            </div>
+            <input type="hidden" data-id-field>
+        </div>
+    </template>
 @endsection
 
 @push('scripts')
@@ -161,68 +187,37 @@
                     subtotal += lineTotal;
                     itemCount += quantity;
 
-                    const row = document.createElement('div');
-                    row.className = 'border-bottom pb-2 mb-3';
+                    const row = document.getElementById('cart-line').content.firstElementChild.cloneNode(true);
+                    row.querySelector('[data-name]').textContent = product.name;
+                    row.querySelector('[data-price]').textContent = `${formatCurrency(product.price)} / ${product.unit}`;
+                    row.querySelector('[data-subtotal]').textContent = formatCurrency(lineTotal);
 
-                    const identity = document.createElement('div');
-                    identity.className = 'd-flex flex-wrap justify-content-between gap-2 mb-2';
-                    const name = document.createElement('strong');
-                    name.textContent = product.name;
-                    const price = document.createElement('span');
-                    price.textContent = `${formatCurrency(product.price)} / ${product.unit}`;
-                    identity.append(name, price);
-
-                    const controls = document.createElement('div');
-                    controls.className = 'input-group input-group-sm mb-2';
-                    const decrease = document.createElement('button');
-                    decrease.type = 'button';
-                    decrease.className = 'btn btn-outline-secondary';
-                    decrease.setAttribute('aria-label', `Kurangi ${product.name}`);
-                    decrease.textContent = '−';
-                    decrease.addEventListener('click', () => changeQuantity(id, quantity - 1));
-
-                    const quantityInput = document.createElement('input');
-                    quantityInput.className = 'form-control text-center';
-                    quantityInput.type = 'number';
-                    quantityInput.min = '1';
+                    const quantityInput = row.querySelector('[data-quantity]');
+                    quantityInput.name = `items[${index}][jumlah]`;
                     quantityInput.max = String(product.stock);
                     quantityInput.value = String(quantity);
+                    quantityInput.required = true;
                     quantityInput.setAttribute('aria-label', `Jumlah ${product.name}`);
                     quantityInput.addEventListener('change', () => changeQuantity(id, quantityInput.value));
 
-                    const increase = document.createElement('button');
-                    increase.type = 'button';
-                    increase.className = 'btn btn-outline-secondary';
-                    increase.setAttribute('aria-label', `Tambah ${product.name}`);
-                    increase.textContent = '+';
+                    const decrease = row.querySelector('[data-decrease]');
+                    decrease.disabled = quantity <= 1;
+                    decrease.setAttribute('aria-label', `Kurangi ${product.name}`);
+                    decrease.addEventListener('click', () => changeQuantity(id, quantity - 1));
+                    const increase = row.querySelector('[data-increase]');
                     increase.disabled = quantity >= product.stock;
+                    increase.setAttribute('aria-label', `Tambah ${product.name}`);
                     increase.addEventListener('click', () => changeQuantity(id, quantity + 1));
-                    controls.append(decrease, quantityInput, increase);
-
-                    const actions = document.createElement('div');
-                    actions.className = 'd-flex align-items-center justify-content-between';
-                    const total = document.createElement('strong');
-                    total.textContent = formatCurrency(lineTotal);
-                    const remove = document.createElement('button');
-                    remove.type = 'button';
-                    remove.className = 'btn btn-sm btn-outline-danger';
-                    remove.textContent = 'Hapus';
+                    const remove = row.querySelector('[data-remove]');
+                    remove.setAttribute('aria-label', `Hapus ${product.name}`);
                     remove.addEventListener('click', () => {
                         cart.delete(id);
                         renderCart();
                     });
-                    actions.append(total, remove);
 
-                    const idInput = document.createElement('input');
-                    idInput.type = 'hidden';
+                    const idInput = row.querySelector('[data-id-field]');
                     idInput.name = `items[${index}][idbarang]`;
                     idInput.value = String(id);
-                    const serverQuantity = document.createElement('input');
-                    serverQuantity.type = 'hidden';
-                    serverQuantity.name = `items[${index}][jumlah]`;
-                    serverQuantity.value = String(quantity);
-
-                    row.append(identity, controls, actions, idInput, serverQuantity);
                     cartItems.append(row);
                 });
 
@@ -232,7 +227,9 @@
                 document.getElementById('tax-value').textContent = formatCurrency(tax);
                 document.getElementById('total-value').textContent = formatCurrency(subtotal + tax);
                 cartCount.textContent = `${itemCount} item`;
-                emptyCart.classList.toggle('d-none', cart.size > 0);
+                document.getElementById('mobile-count').textContent = cartCount.textContent;
+                emptyCart.hidden = cart.size > 0;
+                cartItems.hidden = cart.size === 0;
                 updatePayment();
             };
 
@@ -252,17 +249,32 @@
                 }
             });
 
-            document.getElementById('product-search').addEventListener('input', (event) => {
-                const query = event.target.value.trim().toLocaleLowerCase('id-ID');
-                let visible = 0;
+            const search = document.getElementById('product-search');
+            const clearSearch = document.getElementById('clear-search');
+            clearSearch.addEventListener('click', () => {
+                search.value = '';
+                search.dispatchEvent(new Event('input'));
+                search.focus();
+            });
+            search.addEventListener('input', () => {
+                clearSearch.hidden = !search.value;
+            });
 
-                cards.forEach((card) => {
-                    const matches = card.dataset.id === query || card.dataset.name.toLocaleLowerCase('id-ID').includes(query);
-                    card.classList.toggle('d-none', ! matches);
-                    visible += matches ? 1 : 0;
-                });
-
-                document.getElementById('search-empty').classList.toggle('d-none', visible > 0 || cards.length === 0);
+            const pos = document.querySelector('.md3-pos');
+            const openCart = document.getElementById('open-cart');
+            let catalogScroll = 0;
+            openCart.addEventListener('click', () => {
+                catalogScroll = window.scrollY;
+                pos.dataset.mobilePanel = 'cart';
+                openCart.setAttribute('aria-expanded', 'true');
+                document.getElementById('cart-title').focus();
+                document.getElementById('pos-cart-panel').scrollIntoView({block: 'start'});
+            });
+            document.getElementById('back-to-catalog').addEventListener('click', () => {
+                pos.dataset.mobilePanel = 'catalog';
+                openCart.setAttribute('aria-expanded', 'false');
+                openCart.focus({preventScroll: true});
+                window.scrollTo(0, catalogScroll);
             });
 
             document.getElementById('payment-form').addEventListener('submit', () => {

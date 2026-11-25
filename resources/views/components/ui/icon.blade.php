@@ -32,6 +32,11 @@
         @case('percent')
             <circle cx="7" cy="7" r="2.25"/><circle cx="17" cy="17" r="2.25"/><path d="m18.5 5.5-13 13"/>
             @break
+        @case('shopping-basket')
+            <path d="m6.5 9 4-5.5m7 5.5-4-5.5"/>
+            <rect x="2" y="9" width="20" height="3.5" rx="1.5"/>
+            <path d="m4 12.5 1.6 6.7A2 2 0 0 0 7.5 21h9a2 2 0 0 0 1.9-1.8l1.6-6.7M10 15.5v2.5m4-2.5v2.5"/>
+            @break
         @case('shopping-cart')
             <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"/><circle cx="9.5" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>
             @break

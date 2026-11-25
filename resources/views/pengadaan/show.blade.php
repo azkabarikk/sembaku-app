@@ -19,7 +19,7 @@
         <dd>{{ match ($pengadaan->status) { 'A' => 'Siap diterima', 'N' => 'Ditahan', default => $pengadaan->status } }}</dd>
     </dl>
 
-    <x-ui.table label="Detail Pengadaan">
+    <x-ui.data-table label="Detail Pengadaan">
         <x-slot:head>
             <tr>
                 <th scope="col">Barang</th>
@@ -44,7 +44,7 @@
         @empty
             <tr><td colspan="7" class="text-center">Belum ada rincian barang.</td></tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 
     <dl class="md3-record">
         <dt>Subtotal</dt>

@@ -34,11 +34,7 @@
     @endif
 
     <x-ui.card variant="outlined">
-        <x-slot:header>
-            <span class="md3-type-label-large md3-muted">Jumlah data <strong>{{ $jumlahBarang }}</strong></span>
-        </x-slot:header>
-
-        <x-ui.table label="Daftar Barang">
+        <x-ui.data-table label="Daftar Barang" :filters="['Jenis' => 2, 'Status' => 5]" :paginator="$halamanBarang">
             <x-slot:head>
                 <tr>
                     <th scope="col">ID</th>
@@ -50,8 +46,8 @@
                     <th scope="col">Aksi</th>
                 </tr>
             </x-slot:head>
-            @forelse ($halamanBarang as $barang)
-                <tr>
+            @forelse ($daftarBarang as $barang)
+                <tr @if ($loop->iteration < $halamanBarang->firstItem() || $loop->iteration > $halamanBarang->lastItem()) hidden @endif>
                     <td>{{ $barang->idbarang }}</td>
                     <td>{{ $barang->nama }}</td>
                     <td>{{ $barang->jenis === 'S' ? 'Sembako' : 'Rumah Tangga' }}</td>
@@ -85,18 +81,7 @@
                     <td colspan="7"><x-ui.empty-state title="Belum ada data barang." /></td>
                 </tr>
             @endforelse
-        </x-ui.table>
+        </x-ui.data-table>
 
-        @if ($halamanBarang->hasPages())
-            <x-ui.pagination label="Halaman daftar barang" class="md3-cluster">
-                <x-ui.button variant="outlined" size="small" :href="$halamanBarang->previousPageUrl()" :disabled="$halamanBarang->onFirstPage()">
-                    Sebelumnya
-                </x-ui.button>
-                <span class="md3-type-label-large">Halaman {{ $halamanBarang->currentPage() }} dari {{ $halamanBarang->lastPage() }}</span>
-                <x-ui.button variant="outlined" size="small" :href="$halamanBarang->nextPageUrl()" :disabled="! $halamanBarang->hasMorePages()">
-                    Berikutnya
-                </x-ui.button>
-            </x-ui.pagination>
-        @endif
     </x-ui.card>
 @endsection

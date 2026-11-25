@@ -16,7 +16,10 @@
                 <x-ui.icon-button label="Navigasi utama" icon="menu" class="md3-app-bar__menu"
                     aria-controls="mainNavigation" aria-expanded="true" data-md3-disclosure hidden />
             @endauth
-            <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">SembaKu</a>
+            <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">
+                <x-ui.icon name="shopping-basket" />
+                SembaKu
+            </a>
         </x-slot:leading>
         <x-slot:actions>
             @auth
@@ -25,7 +28,7 @@
                     @csrf
                     <x-ui.button variant="text" type="submit">Keluar</x-ui.button>
                 </form>
-            @else
+            @elseif (! request()->routeIs('login'))
                 <x-ui.button variant="tonal" :href="route('login')">Masuk</x-ui.button>
             @endauth
         </x-slot:actions>
@@ -74,7 +77,7 @@
             <x-ui.page-container class="md3-stack" id="konten-utama" tabindex="-1">
                 @hasSection('page-header')
                     @yield('page-header')
-                @else
+                @elseif (! request()->routeIs('login'))
                     <x-ui.page-header
                         :title="html_entity_decode($__env->yieldContent('heading'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"
                         :subtitle="html_entity_decode($__env->yieldContent('description'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"

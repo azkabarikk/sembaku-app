@@ -34,8 +34,6 @@
         </div>
     @endif
 
-    <p class="md3-type-label-large md3-muted mb-0">Jumlah data: <strong>{{ count($daftarPenerimaan) }}</strong></p>
-
     @can('penerimaan.draf')
         <div class="collapse" id="formTambahPenerimaan">
             <form class="row g-2 align-items-end mb-3" method="GET" action="{{ route('penerimaan.pilih-pengadaan') }}">
@@ -60,7 +58,7 @@
         @endif
     @endcan
 
-    <x-ui.table label="Daftar Penerimaan">
+    <x-ui.data-table label="Daftar Penerimaan" :filters="['Tanggal' => 1, 'Status' => 5]">
         <x-slot:head>
             <tr>
                 <th scope="col">ID Penerimaan</th>
@@ -115,5 +113,5 @@
                 <td colspan="7" class="text-center">Belum ada data penerimaan.</td>
             </tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 @endsection

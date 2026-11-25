@@ -16,9 +16,7 @@
         <x-ui.snackbar variant="success">{{ session('success') }}</x-ui.snackbar>
     @endif
 
-    <p class="md3-type-label-large md3-muted mb-0">Jumlah data: <strong>{{ count($daftarMargin) }}</strong></p>
-
-    <x-ui.table label="Margin Penjualan">
+    <x-ui.data-table label="Margin Penjualan" :filters="['Status' => 3]">
         <x-slot:head>
             <tr>
                 <th scope="col">ID</th>
@@ -66,5 +64,5 @@
                 <td colspan="7" class="text-center">Belum ada data margin penjualan.</td>
             </tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 @endsection

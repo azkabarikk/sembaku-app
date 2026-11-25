@@ -26,7 +26,7 @@
 
         <p class="md3-muted mb-2">Kosongkan harga untuk memakai harga yang tercatat pada pengadaan.</p>
 
-        <x-ui.table label="Penerimaan Barang">
+        <x-ui.data-table label="Penerimaan Barang">
             <x-slot:head>
                 <tr>
                     <th scope="col">Barang</th>
@@ -38,7 +38,7 @@
                     <th scope="col">Harga Satuan Terima (Rp)</th>
                 </tr>
             </x-slot:head>
-            @foreach ($barisPesanan as $baris)
+            @forelse ($barisPesanan as $baris)
                 <tr>
                     <td>{{ $baris->nama_barang }}</td>
                     <td>{{ $baris->jumlah_dipesan }}</td>
@@ -77,8 +77,10 @@
                         @enderror
                     </td>
                 </tr>
-            @endforeach
-        </x-ui.table>
+            @empty
+                <tr><td colspan="7" class="text-center">Tidak ada barang yang masih dapat diterima.</td></tr>
+            @endforelse
+        </x-ui.data-table>
 
         <div class="md3-cluster">
             <x-ui.button variant="filled" type="submit">Simpan Penerimaan</x-ui.button>

@@ -13,7 +13,7 @@
             <select class="md3-control md3-control--select" id="barang" name="barang">
                 <option value="">Semua barang</option>
                 @foreach ($daftarBarang as $barang)
-                    <option value="{{ $barang->idbarang }}" @selected($idBarang == $barang->idbarang)>{{ $barang->nama }}</option>
+                    <option value="{{ $barang->idbarang }}" @selected($idBarang == $barang->idbarang)>#{{ $barang->idbarang }} · {{ $barang->nama }}</option>
                 @endforeach
             </select>
         </div>
@@ -50,7 +50,7 @@
         <p><a href="{{ route('penerimaan.show', $idPenerimaan) }}">Penerimaan #{{ $idPenerimaan }}</a></p>
     @endif
 
-    <x-ui.table label="Kartu Stok">
+    <x-ui.data-table label="Kartu Stok" :paginator="$mutasi" :server="true">
         <x-slot:head>
             <tr>
                 <th scope="col">Tanggal</th>
@@ -88,9 +88,6 @@
                 <td class="text-center" colspan="7">Belum ada mutasi stok untuk pilihan ini.</td>
             </tr>
         @endforelse
-    </x-ui.table>
+    </x-ui.data-table>
 
-    @if ($mutasi->hasPages())
-        <x-ui.pagination>{{ $mutasi->links('pagination::simple-bootstrap-5') }}</x-ui.pagination>
-    @endif
 @endsection
