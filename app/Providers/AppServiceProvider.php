@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
             'penjualan.kelola' => ['Admin', 'Kasir'],
             'kartu-stok.baca' => ['Admin', 'Petugas Gudang', 'Staf Pengadaan', 'Supervisor'],
             'stok-barang.baca' => ['Admin', 'Kasir', 'Petugas Gudang', 'Staf Pengadaan', 'Supervisor'],
+            'retur.baca' => ['Admin', 'Supervisor', 'Petugas Gudang', 'Staf Pengadaan'],
+            'retur.buat' => ['Admin', 'Supervisor', 'Petugas Gudang'],
         ];
 
         foreach ($akses as $izin => $role) {

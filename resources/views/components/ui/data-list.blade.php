@@ -1,7 +1,8 @@
-@props(['label', 'filters' => [], 'emptyId' => null, 'paginator' => null, 'server' => false])
+@props(['label', 'filters' => [], 'emptyId' => null, 'paginator' => null, 'server' => false, 'numbered' => false])
 
 <div class="md3-stack md3-data-list" data-list data-page="{{ $paginator?->currentPage() ?? 1 }}"
-    @if ($server) data-server data-per-page="{{ $paginator->perPage() }}" @endif>
+    @if ($server) data-server data-per-page="{{ $paginator->perPage() }}" @endif
+    @if ($numbered) data-numbered @endif>
     <div class="md3-data-toolbar" data-toolbar hidden>
         @isset($search)
             {{ $search }}
@@ -40,7 +41,10 @@
             @else
                 <x-ui.button data-prev variant="outlined" size="small">Sebelumnya</x-ui.button>
             @endif
-            <span data-page-label aria-current="page">Halaman {{ $paginator?->currentPage() ?? 1 }}</span>
+            @if ($numbered)
+                <div class="md3-data-page-numbers" data-page-numbers></div>
+            @endif
+            <span data-page-label @if ($numbered) class="visually-hidden" aria-live="polite" @else aria-current="page" @endif>Halaman {{ $paginator?->currentPage() ?? 1 }}</span>
             @if ($paginator)
                 <a class="md3-action md3-button md3-button--outlined md3-button--small" data-next
                     @if ($paginator->nextPageUrl()) href="{{ $paginator->nextPageUrl() }}" @else aria-disabled="true" @endif>Berikutnya</a>

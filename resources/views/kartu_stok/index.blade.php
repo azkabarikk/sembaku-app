@@ -70,11 +70,14 @@
                     'M', 'P' => 'Penerimaan',
                     'B' => 'Koreksi Penerimaan',
                     'J' => 'Penjualan',
+                    'R' => 'Retur ke Vendor',
                     default => $baris->jenis_transaksi,
                 } }}</td>
                 <td>
                     @if ($baris->idpenerimaan)
                         <a href="{{ route('penerimaan.show', $baris->idpenerimaan) }}">#{{ $baris->idtransaksi }}</a>
+                    @elseif ($baris->jenis_transaksi === 'R' && Gate::allows('retur.baca'))
+                        <a href="{{ route('retur.show', $baris->idtransaksi) }}">#{{ $baris->idtransaksi }}</a>
                     @else
                         #{{ $baris->idtransaksi }}
                     @endif

@@ -30,7 +30,39 @@ function initializeList(root) {
     let matches = items;
     const prev = find('[data-prev]');
     const next = find('[data-next]');
+    const pageNumbers = find('[data-page-numbers]');
     let useLaravelLinks = !!size && prev.tagName === 'A';
+    function renderPageNumbers(pages) {
+        if (!pageNumbers) return;
+
+        const firstMiddlePage = Math.min(Math.max(page - 2, 2), pages - 5);
+        const visiblePages = pages <= 7
+            ? Array.from({length: pages}, (_, index) => index + 1)
+            : [1, ...Array.from({length: 5}, (_, index) => firstMiddlePage + index), pages];
+        const controls = [];
+        let previousPage = 0;
+
+        for (const number of visiblePages) {
+            if (number - previousPage > 1) {
+                const gap = document.createElement('span');
+                gap.textContent = '…';
+                gap.setAttribute('aria-hidden', 'true');
+                controls.push(gap);
+            }
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'md3-action md3-button md3-button--outlined md3-button--small';
+            button.dataset.goPage = number;
+            button.setAttribute('aria-label', 'Halaman ' + number);
+            if (number === page) button.setAttribute('aria-current', 'page');
+            button.textContent = number;
+            controls.push(button);
+            previousPage = number;
+        }
+
+        pageNumbers.replaceChildren(...controls);
+    }
     function setAvailable(control, available) {
         if (control.tagName === 'A') {
             control.setAttribute('aria-disabled', String(!available));
@@ -68,6 +100,7 @@ function initializeList(root) {
             find('[data-page-label]').textContent = 'Halaman ' + page + ' dari ' + pages;
             setAvailable(prev, page > 1);
             setAvailable(next, page < pages);
+            renderPageNumbers(pages);
         }
     }
     function filterItems() {
@@ -85,6 +118,13 @@ function initializeList(root) {
     search.addEventListener('keydown', event => { if (event.key === 'Enter') event.preventDefault(); });
     for (const control of [...filters, ...(size ? [size] : [])]) control.addEventListener('change', reset);
     if (!server) {
+        pageNumbers?.addEventListener('click', event => {
+            const button = event.target.closest('[data-go-page]');
+            if (!button) return;
+            page = Number(button.dataset.goPage);
+            render();
+            pageNumbers.querySelector('[aria-current="page"]')?.focus();
+        });
         for (const [control, step] of [[prev, -1], [next, 1]]) {
             control.addEventListener('click', event => {
                 if (useLaravelLinks) return;

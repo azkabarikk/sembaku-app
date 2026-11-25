@@ -105,12 +105,36 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('can:penjualan.kelola')
         ->block(60, 15)
         ->name('penjualan.store');
+
+    Route::get('/retur', [ReturController::class, 'index'])
+        ->middleware('can:retur.baca')
+        ->name('retur.index');
+
+    Route::get('/retur/sumber', [ReturController::class, 'sumber'])
+        ->middleware('can:retur.baca')
+        ->name('retur.sumber');
+
+    Route::get('/retur/sumber/{id}', [ReturController::class, 'rincianSumber'])
+        ->whereNumber('id')
+        ->middleware('can:retur.baca')
+        ->name('retur.sumber.show');
+
+    Route::get('/retur/create/{id}', [ReturController::class, 'create'])
+        ->whereNumber('id')
+        ->middleware('can:retur.buat')
+        ->name('retur.create');
+
+    Route::get('/retur/{id}', [ReturController::class, 'show'])
+        ->whereNumber('id')
+        ->middleware('can:retur.baca')
+        ->name('retur.show');
+
+    Route::post('/retur', [ReturController::class, 'store'])
+        ->middleware('can:retur.buat')
+        ->name('retur.store');
 });
 
 Route::middleware(['auth', 'can:administrasi'])->group(function (): void {
-    Route::get('/retur', [ReturController::class, 'index'])
-        ->name('retur.index');
-
     Route::get('/barang', [BarangController::class, 'index'])
         ->name('barang.index');
 
