@@ -1,4 +1,3 @@
--- Function harga jual SembaKu. Jalankan setelah ddl_web_sembako.sql.
 USE db_web_sembako;
 
 DROP FUNCTION IF EXISTS fn_harga_jual;
@@ -13,10 +12,48 @@ RETURNS BIGINT
 DETERMINISTIC
 NO SQL
 BEGIN
-    RETURN ROUND(p_harga_dasar * (1 + p_persen_margin / 100), 0);
+    DECLARE v_harga_jual BIGINT;
+
+    -- Menghitung harga jual berdasarkan margin
+    SET v_harga_jual = ROUND(
+        p_harga_dasar + (p_harga_dasar * p_persen_margin / 100),
+        0
+    );
+
+    -- Mengembalikan hasil harga jual
+    RETURN v_harga_jual;
 END$$
 
 DELIMITER ;
 
--- Uji: harga dasar 10000 dengan margin 12% menghasilkan 11200.
-SELECT fn_harga_jual(10000, 12) AS harga_jual;
+
+-- Membuat function untuk menghitung subtotal barang
+DELIMITER $$
+CREATE FUNCTION fn_hitung_subtotal(
+    p_jumlah INT,
+    p_harga_satuan INT
+)
+RETURNS BIGINT
+DETERMINISTIC
+NO SQL
+BEGIN
+    -- Mengalikan jumlah barang dengan harga satuan
+    RETURN p_jumlah * p_harga_satuan;
+END$$
+
+DELIMITER ;
+
+
+-- Membuat function untuk menghitung PPN tetap sebesar 11%
+DELIMITER $$
+CREATE FUNCTION fn_hitung_ppn(
+    p_subtotal BIGINT
+)
+RETURNS BIGINT
+DETERMINISTIC
+NO SQL
+BEGIN
+    -- Menghitung PPN sebesar 11% dari subtotal
+    RETURN ROUND(p_subtotal * 11 / 100, 0);
+END$$
+DELIMITER ;
