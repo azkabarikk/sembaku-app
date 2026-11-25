@@ -43,18 +43,20 @@
                 <td>{{ $margin->username }}</td>
                 <td>{{ $margin->updated_at ?? '—' }}</td>
                 <td class="text-nowrap">
-                    <x-ui.button variant="outlined" size="small" :href="route('margin-penjualan.edit', $margin->idmargin_penjualan)">Edit</x-ui.button>
+                    <x-ui.button icon-name="edit" variant="outlined" size="small" :href="route('margin-penjualan.edit', $margin->idmargin_penjualan)">Edit</x-ui.button>
 
                     @if ($margin->status == 1)
                         <form
                             class="d-inline"
                             method="POST"
                             action="{{ route('margin-penjualan.destroy', $margin->idmargin_penjualan) }}"
+                            data-md3-confirm="Nonaktifkan margin #{{ $margin->idmargin_penjualan }}? POS membutuhkan tepat satu margin aktif untuk memproses penjualan."
+                            data-md3-confirm-action="Nonaktifkan"
                             onsubmit="return confirm('Nonaktifkan margin ini?')"
                         >
                             @csrf
                             @method('DELETE')
-                            <x-ui.button variant="outlined" size="small" class="md3-action--error" type="submit">Nonaktifkan</x-ui.button>
+                            <x-ui.button icon-name="archive" variant="outlined" size="small" class="md3-action--error" type="submit">Nonaktifkan</x-ui.button>
                         </form>
                     @endif
                 </td>

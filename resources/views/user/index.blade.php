@@ -35,16 +35,18 @@
                 <td>{{ $user->username }}</td>
                 <td>{{ $user->nama_role }}</td>
                 <td class="text-nowrap">
-                    <x-ui.button variant="outlined" size="small" :href="route('user.edit', $user->iduser)">Edit</x-ui.button>
+                    <x-ui.button icon-name="edit" variant="outlined" size="small" :href="route('user.edit', $user->iduser)">Edit</x-ui.button>
                     <form
                         class="d-inline"
                         method="POST"
                         action="{{ route('user.destroy', $user->iduser) }}"
+                        data-md3-confirm="Hapus akun “{{ $user->username }}”? Akun yang terhubung dengan transaksi tidak dapat dihapus."
+                        data-md3-confirm-action="Hapus"
                         onsubmit="return confirm('Hapus user ini?')"
                     >
                         @csrf
                         @method('DELETE')
-                        <x-ui.button variant="outlined" size="small" class="md3-action--error" type="submit">Hapus</x-ui.button>
+                        <x-ui.button icon-name="trash" variant="outlined" size="small" class="md3-action--error" type="submit">Hapus</x-ui.button>
                     </form>
                 </td>
             </tr>

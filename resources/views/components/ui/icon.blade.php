@@ -14,6 +14,45 @@
         @case('menu')
             <path d="M4 6h16M4 12h16M4 18h16"/>
             @break
+        @case('home')
+            <path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9Z"/><path d="M9 21v-7h6v7"/>
+            @break
+        @case('lock')
+            <rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3"/>
+            @break
+        @case('eye')
+            <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>
+            @break
+        @case('eye-off')
+            <path d="m3 3 18 18M10.6 6.1C11 6 11.5 6 12 6c6.4 0 10 6 10 6a15 15 0 0 1-2.1 2.5M17 17a10 10 0 0 1-5 1c-6.4 0-10-6-10-6a16 16 0 0 1 4.2-4.1m4.1 2.4a2.5 2.5 0 0 0 3.4 3.4"/>
+            @break
+        @case('login')
+            <path d="M11 4h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-7m-7-8h11m-4-4 4 4-4 4"/>
+            @break
+        @case('logout')
+            <path d="M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7m-4-8h11m-4-4 4 4-4 4"/>
+            @break
+        @case('sun')
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>
+            @break
+        @case('moon')
+            <path d="M20.7 14.3A9 9 0 0 1 9.7 3.3a9 9 0 1 0 11 11Z"/>
+            @break
+        @case('edit')
+            <path d="m14.5 6.5 3 3M4 20l4-.8L20 7.2a2.1 2.1 0 0 0-3-3L5 16l-1 4Z"/>
+            @break
+        @case('archive')
+            <rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9m-9 4h4"/>
+            @break
+        @case('trash')
+            <path d="M3 6h18M9 6V4h6v2M6 6l1 14h10l1-14M10 10v6m4-6v6"/>
+            @break
+        @case('chevron-right')
+            <path d="m9 6 6 6-6 6"/>
+            @break
+        @case('chevron-left')
+            <path d="m15 6-6 6 6 6"/>
+            @break
         @case('person')
             <circle cx="12" cy="8" r="3.25"/><path d="M5 20v-1a7 7 0 0 1 14 0v1"/>
             @break

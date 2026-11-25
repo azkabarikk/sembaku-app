@@ -179,7 +179,10 @@ class PenerimaanService
             }
 
             $harga = (int) ($hargaInput[$idBarang] ?? $detailTercatat[$idBarang]->harga_satuan_terima ?? $baris->harga_pesanan);
-            $subtotal = $jumlah * $harga;
+            $subtotal = (int) DB::selectOne(
+                'SELECT fn_hitung_subtotal(?, ?) AS subtotal',
+                [$jumlah, $harga]
+            )->subtotal;
 
             if ($harga < 0 || $subtotal > 2147483647) {
                 throw ValidationException::withMessages([

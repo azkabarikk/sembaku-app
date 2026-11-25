@@ -1,4 +1,4 @@
-@props(['variant' => 'filled', 'size' => 'medium', 'type' => 'button', 'disabled' => false, 'loading' => false, 'fullWidth' => false, 'href' => null])
+@props(['variant' => 'filled', 'size' => 'medium', 'type' => 'button', 'disabled' => false, 'loading' => false, 'fullWidth' => false, 'href' => null, 'iconName' => null])
 
 @php
     $variant = in_array($variant, ['filled', 'elevated', 'tonal', 'outlined', 'text'], true) ? $variant : 'filled';
@@ -23,6 +23,8 @@
         <span class="md3-spinner" aria-hidden="true"></span>
     @elseif (isset($icon))
         <span class="md3-button__icon">{{ $icon }}</span>
+    @elseif ($iconName !== null)
+        <span class="md3-button__icon"><x-ui.icon :name="$iconName" /></span>
     @endif
     {{ $slot }}
 @if ($href !== null)

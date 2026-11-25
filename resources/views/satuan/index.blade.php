@@ -37,18 +37,20 @@
                     @endif
                 </td>
                 <td class="text-nowrap">
-                    <x-ui.button variant="outlined" size="small" :href="route('satuan.edit', $satuan->idsatuan)">Edit</x-ui.button>
+                    <x-ui.button icon-name="edit" variant="outlined" size="small" :href="route('satuan.edit', $satuan->idsatuan)">Edit</x-ui.button>
 
                     @if ($satuan->status == 1)
                         <form
                             class="d-inline"
                             method="POST"
                             action="{{ route('satuan.destroy', $satuan->idsatuan) }}"
+                            data-md3-confirm="Nonaktifkan satuan “{{ $satuan->nama_satuan }}”? Satuan tetap tercatat sebagai tidak aktif."
+                            data-md3-confirm-action="Nonaktifkan"
                             onsubmit="return confirm('Nonaktifkan satuan ini?')"
                         >
                             @csrf
                             @method('DELETE')
-                            <x-ui.button variant="outlined" size="small" class="md3-action--error" type="submit">Nonaktifkan</x-ui.button>
+                            <x-ui.button icon-name="archive" variant="outlined" size="small" class="md3-action--error" type="submit">Nonaktifkan</x-ui.button>
                         </form>
                     @endif
                 </td>

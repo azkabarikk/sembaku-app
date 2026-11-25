@@ -37,7 +37,13 @@
                 <td>{{ $detail->nama_satuan ?? '—' }}</td>
                 <td>{{ $detail->jumlah }}</td>
                 <td>{{ $detail->jumlah_diterima }}</td>
-                <td>{{ $detail->jumlah_sisa }}</td>
+                <td class="md3-table__numeric">
+                    @if ($detail->jumlah_sisa > 0)
+                        <x-ui.chip variant="warning">{{ number_format($detail->jumlah_sisa, 0, ',', '.') }}</x-ui.chip>
+                    @else
+                        <span class="md3-muted">0</span>
+                    @endif
+                </td>
                 <td>Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($detail->sub_total, 0, ',', '.') }}</td>
             </tr>
@@ -57,6 +63,10 @@
 
     <div class="md3-cluster">
         <x-ui.button variant="tonal" :href="route('pengadaan.index')">Kembali</x-ui.button>
-        <x-ui.button variant="outlined" :href="route('penerimaan.index', ['pengadaan' => $pengadaan->idpengadaan])">Riwayat Penerimaan</x-ui.button>
+        @can('penerimaan.baca')
+            <x-ui.button variant="outlined" icon-name="package-check" :href="route('penerimaan.index', ['pengadaan' => $pengadaan->idpengadaan])">
+                Lihat Riwayat Penerimaan
+            </x-ui.button>
+        @endcan
     </div>
 @endsection

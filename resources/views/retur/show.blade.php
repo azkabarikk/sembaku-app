@@ -10,8 +10,22 @@
 
     <dl class="md3-record">
         <dt>Tanggal</dt><dd>{{ $retur->created_at }}</dd>
-        <dt>Penerimaan</dt><dd>#{{ $retur->idpenerimaan }}</dd>
-        <dt>Pengadaan</dt><dd>#{{ $retur->idpengadaan }}</dd>
+        <dt>Penerimaan</dt>
+        <dd>
+            @can('penerimaan.baca')
+                <a href="{{ route('penerimaan.show', $retur->idpenerimaan) }}">Lihat Penerimaan #{{ $retur->idpenerimaan }}</a>
+            @else
+                #{{ $retur->idpenerimaan }}
+            @endcan
+        </dd>
+        <dt>Pengadaan</dt>
+        <dd>
+            @can('pengadaan.baca')
+                <a href="{{ route('pengadaan.show', $retur->idpengadaan) }}">Lihat Pengadaan #{{ $retur->idpengadaan }}</a>
+            @else
+                #{{ $retur->idpengadaan }}
+            @endcan
+        </dd>
         <dt>Vendor</dt><dd>{{ $retur->nama_vendor ?? '—' }}</dd>
         <dt>Petugas</dt><dd>{{ $retur->username ?? '—' }}</dd>
     </dl>

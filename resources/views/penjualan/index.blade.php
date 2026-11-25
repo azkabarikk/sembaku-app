@@ -18,7 +18,7 @@
     @endif
 
     @if ($errors->any())
-        <x-ui.alert variant="error" title="Pembayaran belum dapat diproses">
+        <x-ui.alert variant="error" title="Pembayaran belum dapat diproses" data-md3-error-summary tabindex="-1">
             <ul>
                 @foreach (array_unique($errors->all()) as $pesan)
                     <li>{{ $pesan }}</li>
@@ -34,12 +34,15 @@
     <div class="md3-pos" data-mobile-panel="{{ $errors->any() ? 'cart' : 'catalog' }}">
         <section aria-labelledby="catalog-title">
             <x-ui.card variant="outlined">
-                <x-slot:header><h2 id="catalog-title" class="md3-type-title-large">Pilih barang</h2></x-slot:header>
+                <x-slot:header>
+                    <h2 id="catalog-title" class="md3-type-title-large md3-cluster">
+                        <x-ui.icon name="package" /> Pilih barang
+                    </h2>
+                </x-slot:header>
                 <x-ui.data-list label="Katalog barang" empty-id="search-empty">
                     <x-slot:search>
                         <div class="md3-pos-search">
                             <x-ui.search-field label="Cari barang" id="product-search" data-search placeholder="Cari nama atau ID barang..." autocomplete="off" />
-                            <x-ui.icon name="search" class="md3-pos-search-icon" />
                             <x-ui.icon-button id="clear-search" icon="close" label="Hapus pencarian" size="small" hidden />
                         </div>
                     </x-slot:search>
@@ -76,30 +79,41 @@
             <x-ui.card variant="outlined">
                 <x-slot:header>
                     <div class="md3-pos-between">
-                        <h2 class="md3-type-title-large" id="cart-title" tabindex="-1">Keranjang</h2>
+                        <h2 class="md3-type-title-large md3-cluster" id="cart-title" tabindex="-1"><x-ui.icon name="shopping-cart" /> Keranjang</h2>
                         <x-ui.badge id="cart-count">0 item</x-ui.badge>
                         <x-ui.button size="small" variant="text" id="back-to-catalog" class="md3-pos-mobile-action">Kembali ke katalog</x-ui.button>
                     </div>
                 </x-slot:header>
-                <form class="md3-stack" method="POST" action="{{ route('penjualan.store') }}" id="payment-form">
+                <form class="md3-form" method="POST" action="{{ route('penjualan.store') }}" id="payment-form">
                     @csrf
                     <input type="hidden" name="token_pembayaran" value="{{ $tokenPembayaran }}">
                     <div id="cart-items" role="region" aria-label="Barang dalam keranjang" tabindex="0"></div>
                     <x-ui.empty-state id="empty-cart" icon="shopping-cart" title="Keranjang masih kosong"
                         description="Pilih barang dari katalog untuk menambahkannya ke keranjang." />
-                    <dl class="md3-pos-summary">
+                    <dl class="md3-pos-summary" aria-label="Ringkasan belanja">
                         <dt>Subtotal</dt><dd id="subtotal-value">Rp 0</dd>
                         <dt>PPN {{ $persenPpn }}%</dt><dd id="tax-value">Rp 0</dd>
                         <dt class="md3-pos-total">Total</dt><dd class="md3-pos-total md3-type-title-large" id="total-value">Rp 0</dd>
                     </dl>
-                    <x-ui.text-field id="cash" name="uang_diterima" label="Uang diterima (Rp)" type="number"
-                        inputmode="numeric" min="0" step="1" required />
-                    <div class="md3-pos-between" aria-live="polite">
-                        <span id="change-label">Kembalian</span><strong id="change-value">—</strong>
-                    </div>
-                    <x-ui.button id="payment-button" type="submit" full-width disabled>
-                        <span>Proses Pembayaran</span>
-                    </x-ui.button>
+                    <x-ui.form-section title="Pembayaran" icon="receipt" class="md3-pos-payment">
+                        <x-ui.text-field id="cash" name="uang_diterima" label="Uang diterima (Rp)" type="number"
+                            inputmode="numeric" min="0" step="1" required />
+                        <div class="md3-pos-cash-options" role="group" aria-label="Pilihan nominal uang diterima">
+                            @foreach ([2000, 5000, 10000, 50000, 100000] as $nominal)
+                                <x-ui.button variant="outlined" size="small" data-cash-amount="{{ $nominal }}" disabled>
+                                    Rp{{ number_format($nominal, 0, ',', '.') }}
+                                </x-ui.button>
+                            @endforeach
+                        </div>
+                        <div id="payment-change" class="md3-pos-between md3-pos-payment__result" aria-live="polite">
+                            <span id="change-label">Kembalian</span><strong id="change-value">—</strong>
+                        </div>
+                        <x-ui.button id="exact-cash" variant="tonal" icon-name="check" size="small" disabled>Gunakan uang pas</x-ui.button>
+                        <p id="payment-status" class="md3-type-body-small md3-muted mb-0" role="status">Tambahkan barang ke keranjang.</p>
+                        <x-ui.button id="payment-button" type="submit" icon-name="receipt" aria-describedby="payment-status payment-change" full-width disabled>
+                            <span data-payment-label>Proses Pembayaran</span>
+                        </x-ui.button>
+                    </x-ui.form-section>
                 </form>
             </x-ui.card>
         </aside>
@@ -117,7 +131,7 @@
                     <input type="number" min="1" class="md3-control md3-pos-quantity" data-quantity>
                     <x-ui.button variant="tonal" size="small" class="md3-icon-button" data-increase>+</x-ui.button>
                 </div>
-                <x-ui.button variant="text" size="small" data-remove>Hapus</x-ui.button>
+                <x-ui.button icon-name="trash" variant="text" size="small" data-remove>Hapus</x-ui.button>
             </div>
             <input type="hidden" data-id-field>
         </div>
@@ -138,12 +152,21 @@
                 stock: Number(card.dataset.stock),
             }]));
             const cart = new Map();
+            const cartRows = new Map();
             const cartItems = document.getElementById('cart-items');
+            const lineTemplate = document.getElementById('cart-line');
             const emptyCart = document.getElementById('empty-cart');
             const cartCount = document.getElementById('cart-count');
             const cash = document.getElementById('cash');
+            const exactCash = document.getElementById('exact-cash');
+            const cashOptions = document.querySelectorAll('[data-cash-amount]');
+            const changeLabel = document.getElementById('change-label');
+            const changeValue = document.getElementById('change-value');
+            const changeResult = changeLabel.parentElement;
             let total = 0;
             const paymentButton = document.getElementById('payment-button');
+            const paymentStatus = document.getElementById('payment-status');
+            const hasMargin = {{ $margin ? 'true' : 'false' }};
             const currency = new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
@@ -157,12 +180,39 @@
                 const validCash = cash.validity.valid && Number.isSafeInteger(received);
                 const hasAmount = cart.size > 0 && validCash;
                 const difference = received - total;
-                document.getElementById('change-label').textContent = hasAmount && difference < 0 ? 'Kekurangan' : 'Kembalian';
-                document.getElementById('change-value').textContent = hasAmount ? formatCurrency(Math.abs(difference)) : '—';
-                paymentButton.disabled = !hasAmount || difference < 0 || {{ $margin ? 'false' : 'true' }};
+                const short = hasAmount && difference < 0;
+                const label = short ? 'Kekurangan' : 'Kembalian';
+                const value = hasAmount ? formatCurrency(Math.abs(difference)) : '—';
+                if (changeLabel.textContent !== label) changeLabel.textContent = label;
+                if (changeValue.textContent !== value) changeValue.textContent = value;
+                changeResult.toggleAttribute('data-short', short);
+                const empty = cart.size === 0;
+                const reason = !hasMargin ? 'Margin penjualan belum tersedia.'
+                    : empty ? 'Tambahkan barang ke keranjang.'
+                    : !validCash ? 'Masukkan nominal uang diterima.'
+                    : '';
+                if (paymentStatus.textContent !== reason) {
+                    paymentStatus.textContent = reason;
+                }
+                paymentStatus.hidden = reason === '';
+                paymentButton.disabled = reason !== '' || short;
+                exactCash.disabled = empty;
+                cashOptions.forEach((button) => { button.disabled = empty; });
+            };
+
+            const setCash = (amount) => {
+                cash.value = String(amount);
+                updatePayment();
             };
 
             cash.addEventListener('input', updatePayment);
+            cashOptions.forEach((button) => {
+                button.addEventListener('click', () => setCash(button.dataset.cashAmount));
+            });
+            exactCash.addEventListener('click', () => {
+                setCash(total);
+                cash.focus();
+            });
 
             const changeQuantity = (id, quantity) => {
                 const product = products.get(id);
@@ -176,8 +226,46 @@
                 renderCart();
             };
 
+            const createCartRow = (id, product) => {
+                const row = lineTemplate.content.firstElementChild.cloneNode(true);
+                const quantity = row.querySelector('[data-quantity]');
+                const decrease = row.querySelector('[data-decrease]');
+                const increase = row.querySelector('[data-increase]');
+                const remove = row.querySelector('[data-remove]');
+                const idInput = row.querySelector('[data-id-field]');
+                const subtotal = row.querySelector('[data-subtotal]');
+                row.querySelector('[data-name]').textContent = product.name;
+                row.querySelector('[data-price]').textContent = `${formatCurrency(product.price)} / ${product.unit}`;
+                quantity.max = String(product.stock);
+                quantity.required = true;
+                quantity.setAttribute('aria-label', `Jumlah ${product.name}`);
+                quantity.addEventListener('change', () => changeQuantity(id, quantity.value));
+                decrease.setAttribute('aria-label', `Kurangi ${product.name}`);
+                decrease.addEventListener('click', () => changeQuantity(id, cart.get(id) - 1));
+                increase.setAttribute('aria-label', `Tambah ${product.name}`);
+                increase.addEventListener('click', () => changeQuantity(id, cart.get(id) + 1));
+                remove.setAttribute('aria-label', `Hapus ${product.name}`);
+                remove.addEventListener('click', () => {
+                    const nextRow = row.nextElementSibling ?? row.previousElementSibling;
+                    cart.delete(id);
+                    cartRows.delete(id);
+                    row.remove();
+                    renderCart();
+                    const nextControl = nextRow?.querySelector('[data-quantity]');
+                    if (nextControl) {
+                        nextControl.focus();
+                    } else if (backToCatalog.getClientRects().length) {
+                        backToCatalog.click();
+                    } else {
+                        search.focus();
+                    }
+                });
+                idInput.value = String(id);
+                cartItems.append(row);
+                return { quantity, decrease, increase, idInput, subtotal };
+            };
+
             const renderCart = () => {
-                cartItems.replaceChildren();
                 let subtotal = 0;
                 let itemCount = 0;
 
@@ -187,38 +275,21 @@
                     subtotal += lineTotal;
                     itemCount += quantity;
 
-                    const row = document.getElementById('cart-line').content.firstElementChild.cloneNode(true);
-                    row.querySelector('[data-name]').textContent = product.name;
-                    row.querySelector('[data-price]').textContent = `${formatCurrency(product.price)} / ${product.unit}`;
-                    row.querySelector('[data-subtotal]').textContent = formatCurrency(lineTotal);
-
-                    const quantityInput = row.querySelector('[data-quantity]');
-                    quantityInput.name = `items[${index}][jumlah]`;
-                    quantityInput.max = String(product.stock);
-                    quantityInput.value = String(quantity);
-                    quantityInput.required = true;
-                    quantityInput.setAttribute('aria-label', `Jumlah ${product.name}`);
-                    quantityInput.addEventListener('change', () => changeQuantity(id, quantityInput.value));
-
-                    const decrease = row.querySelector('[data-decrease]');
-                    decrease.disabled = quantity <= 1;
-                    decrease.setAttribute('aria-label', `Kurangi ${product.name}`);
-                    decrease.addEventListener('click', () => changeQuantity(id, quantity - 1));
-                    const increase = row.querySelector('[data-increase]');
-                    increase.disabled = quantity >= product.stock;
-                    increase.setAttribute('aria-label', `Tambah ${product.name}`);
-                    increase.addEventListener('click', () => changeQuantity(id, quantity + 1));
-                    const remove = row.querySelector('[data-remove]');
-                    remove.setAttribute('aria-label', `Hapus ${product.name}`);
-                    remove.addEventListener('click', () => {
-                        cart.delete(id);
-                        renderCart();
-                    });
-
-                    const idInput = row.querySelector('[data-id-field]');
-                    idInput.name = `items[${index}][idbarang]`;
-                    idInput.value = String(id);
-                    cartItems.append(row);
+                    if (!cartRows.has(id)) {
+                        cartRows.set(id, createCartRow(id, product));
+                    }
+                    const line = cartRows.get(id);
+                    line.subtotal.textContent = formatCurrency(lineTotal);
+                    line.quantity.name = `items[${index}][jumlah]`;
+                    line.quantity.value = String(quantity);
+                    line.idInput.name = `items[${index}][idbarang]`;
+                    const focused = document.activeElement;
+                    line.decrease.disabled = quantity <= 1;
+                    line.increase.disabled = quantity >= product.stock;
+                    if ((focused === line.decrease && line.decrease.disabled)
+                        || (focused === line.increase && line.increase.disabled)) {
+                        line.quantity.focus();
+                    }
                 });
 
                 const tax = Math.floor((subtotal * taxPercent + 50) / 100);
@@ -262,6 +333,7 @@
 
             const pos = document.querySelector('.md3-pos');
             const openCart = document.getElementById('open-cart');
+            const backToCatalog = document.getElementById('back-to-catalog');
             let catalogScroll = 0;
             openCart.addEventListener('click', () => {
                 catalogScroll = window.scrollY;
@@ -270,7 +342,7 @@
                 document.getElementById('cart-title').focus();
                 document.getElementById('pos-cart-panel').scrollIntoView({block: 'start'});
             });
-            document.getElementById('back-to-catalog').addEventListener('click', () => {
+            backToCatalog.addEventListener('click', () => {
                 pos.dataset.mobilePanel = 'catalog';
                 openCart.setAttribute('aria-expanded', 'false');
                 openCart.focus({preventScroll: true});
@@ -279,7 +351,7 @@
 
             document.getElementById('payment-form').addEventListener('submit', () => {
                 paymentButton.disabled = true;
-                paymentButton.querySelector('span').textContent = 'Memproses Pembayaran…';
+                paymentButton.querySelector('[data-payment-label]').textContent = 'Memproses Pembayaran…';
             });
 
             renderCart();

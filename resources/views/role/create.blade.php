@@ -5,16 +5,15 @@
 @section('description', 'Isi nama role yang akan digunakan oleh user.')
 
 @section('content')
-    <x-ui.card variant="outlined" class="md3-form-card">
-        <form class="md3-stack" method="POST" action="{{ route('role.store') }}">
-            @csrf
+    <form class="md3-form md3-form--standard" method="POST" action="{{ route('role.store') }}">
+        @csrf
 
-            <x-ui.text-field label="Nama Role" id="nama_role" name="nama_role" type="text" maxlength="100" required />
-
-            <div class="md3-cluster">
-                <x-ui.button variant="filled" type="submit">Simpan</x-ui.button>
-                <x-ui.button variant="tonal" :href="route('role.index')">Batal</x-ui.button>
+        <x-ui.form-section title="Identitas role" icon="shield">
+            <div class="md3-form-grid">
+                <x-ui.text-field label="Nama Role" id="nama_role" name="nama_role" type="text" placeholder="Contoh: Petugas Gudang" maxlength="100" required />
             </div>
-        </form>
-    </x-ui.card>
+        </x-ui.form-section>
+
+        <x-ui.form-actions :cancel="route('role.index')" />
+    </form>
 @endsection

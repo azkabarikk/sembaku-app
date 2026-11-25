@@ -150,7 +150,10 @@ class PengadaanService
             }
 
             $hargaSatuan = (int) $hargaPerBarang[$barangId];
-            $subTotalBaris = $jumlah[$index] * $hargaSatuan;
+            $subTotalBaris = (int) DB::selectOne(
+                'SELECT fn_hitung_subtotal(?, ?) AS subtotal',
+                [$jumlah[$index], $hargaSatuan]
+            )->subtotal;
 
             if ($subTotalBaris < 0 || $subTotalBaris > 2147483647 || $subtotal > 2147483647 - $subTotalBaris) {
                 throw ValidationException::withMessages(['idbarang' => 'Subtotal pengadaan melebihi batas nilai yang didukung.']);
@@ -165,7 +168,10 @@ class PengadaanService
             ];
         }
 
-        $ppn = intdiv($subtotal * self::PERSEN_PPN + 50, 100);
+        $ppn = (int) DB::selectOne(
+            'SELECT fn_hitung_ppn(?) AS ppn',
+            [$subtotal]
+        )->ppn;
         $total = $subtotal + $ppn;
 
         if ($total > 2147483647) {

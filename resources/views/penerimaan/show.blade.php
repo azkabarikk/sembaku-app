@@ -13,7 +13,13 @@
 
     <dl class="md3-record">
         <dt>Pengadaan</dt>
-        <dd><a href="{{ route('pengadaan.show', $penerimaan->idpengadaan) }}">#{{ $penerimaan->idpengadaan }}</a></dd>
+        <dd>
+            @can('pengadaan.baca')
+                <a href="{{ route('pengadaan.show', $penerimaan->idpengadaan) }}">Lihat Pengadaan #{{ $penerimaan->idpengadaan }}</a>
+            @else
+                #{{ $penerimaan->idpengadaan }}
+            @endcan
+        </dd>
         <dt>Vendor</dt>
         <dd>{{ $penerimaan->nama_vendor ?? '—' }}</dd>
         <dt>Tanggal</dt>
@@ -55,22 +61,29 @@
         @endforelse
     </x-ui.data-table>
 
-    <dl class="md3-record">
-        <dt>Subtotal Pengadaan</dt>
-        <dd>Rp {{ number_format($penerimaan->subtotal_pengadaan, 0, ',', '.') }}</dd>
-        <dt>PPN (11%)</dt>
-        <dd>Rp {{ number_format($penerimaan->ppn_pengadaan, 0, ',', '.') }}</dd>
-        <dt>Total Pengadaan</dt>
-        <dd>Rp {{ number_format($penerimaan->total_pengadaan, 0, ',', '.') }}</dd>
-    </dl>
+    <section class="md3-stack" aria-labelledby="nilai-pengadaan-asal">
+        <h2 class="md3-type-title-large mb-0" id="nilai-pengadaan-asal">Nilai Pengadaan Asal</h2>
+        <dl class="md3-record">
+            <dt>Subtotal Pengadaan</dt>
+            <dd>Rp {{ number_format($penerimaan->subtotal_pengadaan, 0, ',', '.') }}</dd>
+            <dt>PPN (11%)</dt>
+            <dd>Rp {{ number_format($penerimaan->ppn_pengadaan, 0, ',', '.') }}</dd>
+            <dt>Total Pengadaan</dt>
+            <dd>Rp {{ number_format($penerimaan->total_pengadaan, 0, ',', '.') }}</dd>
+        </dl>
+    </section>
 
     <div class="md3-cluster">
         <x-ui.button variant="tonal" :href="route('penerimaan.index')">Kembali</x-ui.button>
         @can('penerimaan.ubah-draf', $penerimaan)
-            <x-ui.button variant="outlined" :href="route('penerimaan.edit', $penerimaan->idpenerimaan)">Edit</x-ui.button>
+            <x-ui.button icon-name="edit" variant="outlined" :href="route('penerimaan.edit', $penerimaan->idpenerimaan)">Edit</x-ui.button>
         @endcan
-        @if ($penerimaan->status !== 'D')
-            <x-ui.button variant="outlined" :href="route('kartu-stok.index', ['penerimaan' => $penerimaan->idpenerimaan])">Kartu Stok</x-ui.button>
-        @endif
+        @can('kartu-stok.baca')
+            @if ($penerimaan->status !== 'D')
+                <x-ui.button variant="outlined" icon-name="clipboard-list" :href="route('kartu-stok.index', ['penerimaan' => $penerimaan->idpenerimaan])">
+                    Lihat Mutasi Stok
+                </x-ui.button>
+            @endif
+        @endcan
     </div>
 @endsection

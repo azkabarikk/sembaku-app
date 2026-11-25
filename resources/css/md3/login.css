@@ -1,0 +1,128 @@
+.md3-app-frame--login .md3-app-content { align-content: center; }
+.md3-app-frame--login .md3-page-container { max-inline-size: 69rem; }
+
+.md3-login {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: var(--md3-space-12);
+    padding: var(--md3-space-12);
+    border: var(--md3-border) solid var(--md3-outline-variant);
+    border-radius: calc(var(--md3-shape-xl) + var(--md3-space-12));
+    background: var(--md3-surface);
+    box-shadow: var(--md3-shadow-2);
+}
+
+.md3-login__hero {
+    display: grid;
+    align-content: center;
+    gap: var(--md3-space-24);
+    padding: clamp(var(--md3-space-24), 4vw, var(--md3-space-48));
+    border-radius: var(--md3-shape-xl);
+    background: radial-gradient(ellipse at 70% 10%, #336845, transparent 75%), #173e2a;
+    color: #f4fbf4;
+}
+
+.md3-login__hero-copy, .md3-login__heading { display: grid; gap: var(--md3-space-8); }
+.md3-login__hero-copy p, .md3-login__heading :is(h1, p) { margin: 0; }
+.md3-login__hero-copy p:first-child { max-inline-size: 17ch; font-weight: 650; }
+.md3-login__hero-copy p:last-child { max-inline-size: 37ch; color: #d4ebd6; font-size: 1rem; line-height: 1.55; }
+
+.md3-login__art {
+    position: relative;
+    inline-size: min(100%, 20rem);
+    block-size: 12rem;
+    margin-inline: auto;
+}
+
+.md3-login__orbit {
+    position: absolute;
+    inset: 11% 10%;
+    border: 1px dashed rgb(219 245 218 / 45%);
+    border-radius: 50%;
+    transform: rotate(-18deg);
+}
+
+.md3-login__tile {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    box-shadow: var(--md3-shadow-3);
+}
+
+.md3-login__tile--main {
+    --md3-icon-size: 4.5rem;
+    inset: 15% auto auto 50%;
+    inline-size: 8.75rem;
+    aspect-ratio: 1;
+    border-radius: 42% 58% 53% 47% / 45% 37% 63% 55%;
+    transform: translateX(-50%) rotate(-8deg);
+    background: #c8f2c2;
+    color: #163d28;
+}
+
+.md3-login__tile--stock, .md3-login__tile--check {
+    inline-size: var(--md3-space-56);
+    aspect-ratio: 1;
+    border-radius: var(--md3-shape-lg);
+}
+.md3-login__tile--stock { inset: auto auto 8% 9%; transform: rotate(-12deg); background: #edf5d9; color: #324b21; }
+.md3-login__tile--check { inset: 8% 8% auto auto; transform: rotate(12deg); background: #d5eeda; color: #163d28; }
+
+.md3-login__body {
+    display: grid;
+    align-content: center;
+    gap: var(--md3-space-32);
+    min-inline-size: 0;
+    padding: clamp(var(--md3-space-20), 4vw, var(--md3-space-56));
+}
+
+.md3-login__heading h1 { font-weight: 650; }
+.md3-login__heading p { font-size: 1rem; }
+.md3-login__badge {
+    display: grid;
+    place-items: center;
+    inline-size: var(--md3-space-48);
+    block-size: var(--md3-space-48);
+    margin-block-end: var(--md3-space-8);
+    border-radius: var(--md3-shape-lg);
+    background: var(--md3-primary-container);
+    color: var(--md3-on-primary-container);
+}
+
+.md3-login__form .md3-control { min-block-size: var(--md3-space-56); border-radius: var(--md3-shape-md); }
+.md3-login__form .md3-button--filled { margin-block-start: var(--md3-space-4); }
+.md3-login__caps {
+    display: flex;
+    align-items: center;
+    gap: var(--md3-space-8);
+    margin: 0;
+    padding: var(--md3-space-8) var(--md3-space-12);
+    border-radius: var(--md3-shape-sm);
+    background: var(--md3-warning-container);
+    color: var(--md3-on-warning-container);
+}
+.md3-login__caps .md3-icon { --md3-icon-size: var(--md3-space-20); }
+.md3-login input[type="password"]::-ms-reveal { display: none; }
+
+@media (width <= 48rem) {
+    .md3-login {
+        max-inline-size: 30rem;
+        margin-inline: auto;
+        grid-template-columns: minmax(0, 1fr);
+        border-radius: var(--md3-shape-xl);
+    }
+    .md3-login__hero {
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: var(--md3-space-12);
+        padding: var(--md3-space-16);
+        border-radius: var(--md3-shape-lg);
+    }
+    .md3-login__art { inline-size: var(--md3-space-56); block-size: var(--md3-space-56); }
+    .md3-login__tile--main { --md3-icon-size: var(--md3-space-32); inset-block-start: 0; inline-size: 100%; }
+    .md3-login__orbit, .md3-login__tile--stock, .md3-login__tile--check { display: none; }
+    .md3-login__hero-copy p:first-child { max-inline-size: none; font-size: 1rem; line-height: 1.3; }
+    .md3-login__hero-copy p:last-child { font-size: .875rem; }
+    .md3-login__body { gap: var(--md3-space-24); }
+    .md3-login__heading h1 { font-size: clamp(1.5rem, 6vw, 2rem); line-height: 1.2; }
+}

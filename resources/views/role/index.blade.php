@@ -33,16 +33,18 @@
                 <td>{{ $role->idrole }}</td>
                 <td>{{ $role->nama_role }}</td>
                 <td class="text-nowrap">
-                    <x-ui.button variant="outlined" size="small" :href="route('role.edit', $role->idrole)">Edit</x-ui.button>
+                    <x-ui.button icon-name="edit" variant="outlined" size="small" :href="route('role.edit', $role->idrole)">Edit</x-ui.button>
                     <form
                         class="d-inline"
                         method="POST"
                         action="{{ route('role.destroy', $role->idrole) }}"
+                        data-md3-confirm="Hapus role “{{ $role->nama_role }}”? Role yang masih digunakan tidak dapat dihapus."
+                        data-md3-confirm-action="Hapus"
                         onsubmit="return confirm('Hapus role ini?')"
                     >
                         @csrf
                         @method('DELETE')
-                        <x-ui.button variant="outlined" size="small" class="md3-action--error" type="submit">Hapus</x-ui.button>
+                        <x-ui.button icon-name="trash" variant="outlined" size="small" class="md3-action--error" type="submit">Hapus</x-ui.button>
                     </form>
                 </td>
             </tr>

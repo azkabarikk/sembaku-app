@@ -2,6 +2,7 @@
     'kind', 'name' => null, 'id' => null, 'label' => null, 'value' => null, 'placeholder' => null,
     'required' => false, 'disabled' => false, 'readonly' => false, 'helper' => null, 'error' => null,
     'type' => 'text', 'options' => null, 'checked' => false, 'multiple' => false, 'useOld' => true,
+    'leadingIcon' => null,
 ])
 
 @php
@@ -68,8 +69,16 @@
                 @endforeach
             </select>
         @else
-            <input {{ $control }} type="{{ $type }}" @if ($type !== 'file' && is_scalar($current)) value="{{ $current }}" @endif
-                @if ($placeholder !== null) placeholder="{{ $placeholder }}" @endif @required($required) @disabled($disabled) @readonly($readonly)>
+            <div @class(['md3-field__input', 'md3-field__input--leading' => $leadingIcon !== null, 'md3-field__input--trailing' => isset($trailing)])>
+                @if ($leadingIcon !== null)
+                    <x-ui.icon :name="$leadingIcon" class="md3-field__leading" />
+                @endif
+                <input {{ $control }} type="{{ $type }}" @if ($type !== 'file' && is_scalar($current)) value="{{ $current }}" @endif
+                    @if ($placeholder !== null) placeholder="{{ $placeholder }}" @endif @required($required) @disabled($disabled) @readonly($readonly)>
+                @isset($trailing)
+                    <div class="md3-field__trailing">{{ $trailing }}</div>
+                @endisset
+            </div>
         @endif
     @endif
 

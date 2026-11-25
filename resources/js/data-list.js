@@ -3,6 +3,7 @@ function initializeList(root) {
     const table = find('table');
     const search = find('[data-search]');
     const size = find('[data-size]');
+    const clearFilters = find('[data-clear-filters]');
     const server = root.hasAttribute('data-server');
     const filters = [...root.querySelectorAll('[data-column]')];
     const rows = table ? [...table.tBodies[0].rows].filter(row => !row.querySelector('td[colspan]'))
@@ -95,6 +96,9 @@ function initializeList(root) {
             summary += ` (total ${items.length})`;
         }
         find('[data-range]').textContent = summary;
+        if (clearFilters) {
+            clearFilters.disabled = !search.value && !filters.some(control => control.value);
+        }
         if (!server) {
             find('[data-pager]').hidden = pages <= 1;
             find('[data-page-label]').textContent = 'Halaman ' + page + ' dari ' + pages;
@@ -116,6 +120,12 @@ function initializeList(root) {
     }
     search.addEventListener('input', reset);
     search.addEventListener('keydown', event => { if (event.key === 'Enter') event.preventDefault(); });
+    clearFilters?.addEventListener('click', () => {
+        search.value = '';
+        for (const filter of filters) filter.value = '';
+        search.focus();
+        reset();
+    });
     for (const control of [...filters, ...(size ? [size] : [])]) control.addEventListener('change', reset);
     if (!server) {
         pageNumbers?.addEventListener('click', event => {

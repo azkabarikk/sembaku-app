@@ -23,11 +23,11 @@
         @endforeach
     </section>
 
-    <x-ui.data-table label="Stok Barang" :filters="['Kondisi stok' => 6]">
+    <x-ui.data-table compact label="Stok Barang" :filters="['Kondisi stok' => 6]">
         <x-slot:head>
             <tr>
+                <th scope="col" class="md3-table__identity">Barang</th>
                 <th scope="col">ID</th>
-                <th scope="col">Barang</th>
                 <th scope="col">Satuan</th>
                 <th scope="col" class="md3-table__numeric">Total Masuk</th>
                 <th scope="col" class="md3-table__numeric">Total Keluar</th>
@@ -38,8 +38,8 @@
         @forelse ($stok as $barang)
             @php($status = $kondisi[(int) ($barang->saldo > 0)])
             <tr>
+                <td class="md3-table__identity"><strong>{{ $barang->nama }}</strong></td>
                 <td class="md3-muted">{{ $barang->idbarang }}</td>
-                <td><strong>{{ $barang->nama }}</strong></td>
                 <td>{{ $barang->nama_satuan }}</td>
                 <td class="md3-table__numeric">{{ $barang->total_masuk }}</td>
                 <td class="md3-table__numeric">{{ $barang->total_keluar }}</td>

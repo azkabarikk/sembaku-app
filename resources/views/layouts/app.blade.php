@@ -5,38 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - SembaKu</title>
+    <script>
+        try {
+            const storedTheme = localStorage.getItem('sembaku.theme');
+            if (storedTheme === 'dark' || (!storedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.dataset.theme = 'dark';
+            }
+        } catch {}
+    </script>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-<body class="md3">
+<body class="md3" @if ($errors->any()) data-md3-validation-failed @endif>
     <x-ui.button href="#konten-utama" class="md3-skip-link">Lewati navigasi</x-ui.button>
 
     <x-ui.app-topbar class="md3-app-bar">
         <x-slot:leading>
             @auth
                 <x-ui.icon-button label="Navigasi utama" icon="menu" class="md3-app-bar__menu"
-                    aria-controls="mainNavigation" aria-expanded="true" data-md3-disclosure hidden />
+                    aria-controls="mobileNavigation" aria-expanded="false" aria-haspopup="dialog" data-md3-drawer-trigger hidden />
             @endauth
             <a class="md3-app-brand md3-action md3-type-title-large" href="{{ url('/') }}">
-                <x-ui.icon name="shopping-basket" />
+                <span class="md3-app-brand__mark"><x-ui.icon name="shopping-basket" /></span>
                 SembaKu
             </a>
         </x-slot:leading>
         <x-slot:actions>
+            <x-ui.icon-button label="Aktifkan tema gelap" data-md3-theme hidden>
+                <x-ui.icon name="moon" data-theme-icon="light" />
+                <x-ui.icon name="sun" data-theme-icon="dark" hidden />
+            </x-ui.icon-button>
             @auth
                 <x-ui.user-profile :username="auth()->user()->username" :role="auth()->user()->nama_role" />
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <x-ui.button variant="text" type="submit">Keluar</x-ui.button>
+                    <x-ui.button variant="text" type="submit" icon-name="logout" class="md3-app-logout" title="Keluar" aria-label="Keluar">
+                        <span>Keluar</span>
+                    </x-ui.button>
                 </form>
             @elseif (! request()->routeIs('login'))
-                <x-ui.button variant="tonal" :href="route('login')">Masuk</x-ui.button>
+                <x-ui.button variant="tonal" :href="route('login')" icon-name="login">Masuk</x-ui.button>
             @endauth
         </x-slot:actions>
     </x-ui.app-topbar>
 
-    <div @class(['md3-app-frame', 'md3-app-frame--guest' => auth()->guest()])>
+    <div @class(['md3-app-frame', 'md3-app-frame--guest' => auth()->guest(), 'md3-app-frame--login' => request()->routeIs('login')])>
         @auth
-            <x-ui.app-sidebar id="mainNavigation" :internal-toggle="false">
+            <x-ui.app-sidebar id="mainNavigation" :internal-toggle="false" data-md3-drawer-sidebar>
+                <x-ui.navigation-item icon="home" :href="url('/')" :active="request()->is('/')">Beranda</x-ui.navigation-item>
+                <x-ui.divider class="md3-sidebar__divider" />
                 @can('administrasi')
                     <div class="md3-sidebar__group-label md3-type-label-medium">Master</div>
                     <x-ui.navigation-item icon="package" :href="route('barang.index')" :active="request()->routeIs('barang.*')">Barang</x-ui.navigation-item>
@@ -79,6 +95,21 @@
                     @yield('page-header')
                 @elseif (! request()->routeIs('login'))
                     <x-ui.page-header
+                        :icon="match (request()->segment(1)) {
+                            'barang' => 'package',
+                            'satuan' => 'scale',
+                            'vendor' => 'store',
+                            'role' => 'shield',
+                            'user' => 'person',
+                            'margin-penjualan' => 'percent',
+                            'pengadaan' => 'shopping-cart',
+                            'penerimaan' => 'package-check',
+                            'penjualan' => 'receipt',
+                            'retur' => 'rotate-left',
+                            'kartu-stok' => 'clipboard-list',
+                            'stok-barang' => 'warehouse',
+                            default => 'home',
+                        }"
                         :title="html_entity_decode($__env->yieldContent('heading'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"
                         :subtitle="html_entity_decode($__env->yieldContent('description'), ENT_QUOTES | ENT_HTML5, 'UTF-8')"
                     >
@@ -92,6 +123,24 @@
             </x-ui.page-container>
         </div>
     </div>
+    @auth
+        <dialog id="mobileNavigation" class="md3-dialog md3-drawer" aria-labelledby="mobileNavigationTitle" data-md3-dialog>
+            <div class="md3-drawer__content">
+                <header class="md3-drawer__header">
+                    <h2 id="mobileNavigationTitle" class="md3-type-title-large">Navigasi utama</h2>
+                    <x-ui.icon-button label="Tutup navigasi" icon="close" data-md3-dialog-close />
+                </header>
+                <div data-md3-drawer-content></div>
+            </div>
+        </dialog>
+        <x-ui.dialog id="confirmRecordAction" title="Konfirmasi tindakan" aria-describedby="confirmRecordMessage">
+            <p id="confirmRecordMessage" data-md3-confirm-message></p>
+            <x-slot:actions>
+                <x-ui.button variant="text" data-md3-dialog-close autofocus>Batal</x-ui.button>
+                <x-ui.button variant="outlined" class="md3-action--error" data-md3-confirm-submit>Konfirmasi</x-ui.button>
+            </x-slot:actions>
+        </x-ui.dialog>
+    @endauth
     @stack('scripts')
 </body>
 </html>

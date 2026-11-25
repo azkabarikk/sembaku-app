@@ -39,18 +39,20 @@
                     @endif
                 </td>
                 <td class="text-nowrap">
-                    <x-ui.button variant="outlined" size="small" :href="route('vendor.edit', $vendor->idvendor)">Edit</x-ui.button>
+                    <x-ui.button icon-name="edit" variant="outlined" size="small" :href="route('vendor.edit', $vendor->idvendor)">Edit</x-ui.button>
 
                     @if ($vendor->status === 'A')
                         <form
                             class="d-inline"
                             method="POST"
                             action="{{ route('vendor.destroy', $vendor->idvendor) }}"
+                            data-md3-confirm="Nonaktifkan vendor “{{ $vendor->nama_vendor }}”? Vendor tetap tercatat sebagai tidak aktif."
+                            data-md3-confirm-action="Nonaktifkan"
                             onsubmit="return confirm('Nonaktifkan vendor ini?')"
                         >
                             @csrf
                             @method('DELETE')
-                            <x-ui.button variant="outlined" size="small" class="md3-action--error" type="submit">Nonaktifkan</x-ui.button>
+                            <x-ui.button icon-name="archive" variant="outlined" size="small" class="md3-action--error" type="submit">Nonaktifkan</x-ui.button>
                         </form>
                     @endif
                 </td>

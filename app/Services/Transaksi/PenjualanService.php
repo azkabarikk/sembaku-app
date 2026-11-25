@@ -149,9 +149,16 @@ class PenjualanService
                 'SELECT fn_harga_jual(?, ?) AS harga_jual',
                 [(int) $barang->harga, $persenMargin]
             )->harga_jual;
-            $subtotalBaris = $jumlah * $hargaJual;
+            if ($hargaJual <= 0 || $hargaJual > 2147483647) {
+                throw ValidationException::withMessages(['items' => 'Nilai penjualan melebihi batas yang didukung.']);
+            }
 
-            if ($hargaJual <= 0 || $hargaJual > 2147483647 || $subtotalBaris > 2147483647 || $subtotal > 2147483647 - $subtotalBaris) {
+            $subtotalBaris = (int) DB::selectOne(
+                'SELECT fn_hitung_subtotal(?, ?) AS subtotal',
+                [$jumlah, $hargaJual]
+            )->subtotal;
+
+            if ($subtotalBaris > 2147483647 || $subtotal > 2147483647 - $subtotalBaris) {
                 throw ValidationException::withMessages(['items' => 'Nilai penjualan melebihi batas yang didukung.']);
             }
 
@@ -164,7 +171,10 @@ class PenjualanService
             ];
         }
 
-        $ppn = intdiv($subtotal * self::PERSEN_PPN + 50, 100);
+        $ppn = (int) DB::selectOne(
+            'SELECT fn_hitung_ppn(?) AS ppn',
+            [$subtotal]
+        )->ppn;
         $total = $subtotal + $ppn;
 
         if ($total > 2147483647) {
